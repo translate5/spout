@@ -2,14 +2,14 @@
 
 namespace Box\Spout\Common\Helper;
 
+use Box\Spout\Common\Exception\EncodingConversionException;
 use Box\Spout\TestUsingResource;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class EncodingHelperTest
- *
- * @package Box\Spout\Common\Helper
  */
-class EncodingHelperTest extends \PHPUnit_Framework_TestCase
+class EncodingHelperTest extends TestCase
 {
     use TestUsingResource;
 
@@ -59,13 +59,14 @@ class EncodingHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider dataProviderForIconvOrMbstringUsage
-     * @expectedException \Box\Spout\Common\Exception\EncodingConversionException
      *
      * @param bool $shouldUseIconv
      * @return void
      */
     public function testAttemptConversionToUTF8ShouldThrowIfConversionFailed($shouldUseIconv)
     {
+        $this->expectException(EncodingConversionException::class);
+
         $helperStub = $this->getMockBuilder('\Box\Spout\Common\Helper\GlobalFunctionsHelper')
                         ->setMethods(['iconv', 'mb_convert_encoding'])
                         ->getMock();
@@ -84,12 +85,12 @@ class EncodingHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Box\Spout\Common\Exception\EncodingConversionException
-     *
      * @return void
      */
     public function testAttemptConversionToUTF8ShouldThrowIfConversionNotSupported()
     {
+        $this->expectException(EncodingConversionException::class);
+
         /** @var EncodingHelper $encodingHelperStub */
         $encodingHelperStub = $this->getMockBuilder('\Box\Spout\Common\Helper\EncodingHelper')
                         ->disableOriginalConstructor()
@@ -141,13 +142,14 @@ class EncodingHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider dataProviderForIconvOrMbstringUsage
-     * @expectedException \Box\Spout\Common\Exception\EncodingConversionException
      *
      * @param bool $shouldUseIconv
      * @return void
      */
     public function testAttemptConversionFromUTF8ShouldThrowIfConversionFailed($shouldUseIconv)
     {
+        $this->expectException(EncodingConversionException::class);
+
         $helperStub = $this->getMockBuilder('\Box\Spout\Common\Helper\GlobalFunctionsHelper')
                         ->setMethods(['iconv', 'mb_convert_encoding'])
                         ->getMock();
@@ -166,12 +168,12 @@ class EncodingHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Box\Spout\Common\Exception\EncodingConversionException
-     *
      * @return void
      */
     public function testAttemptConversionFromUTF8ShouldThrowIfConversionNotSupported()
     {
+        $this->expectException(EncodingConversionException::class);
+
         /** @var EncodingHelper $encodingHelperStub */
         $encodingHelperStub = $this->getMockBuilder('\Box\Spout\Common\Helper\EncodingHelper')
                         ->disableOriginalConstructor()

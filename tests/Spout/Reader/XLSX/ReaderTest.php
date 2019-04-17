@@ -4,15 +4,14 @@ namespace Box\Spout\Reader\XLSX;
 
 use Box\Spout\Common\Exception\IOException;
 use Box\Spout\Common\Type;
-use Box\Spout\Reader\ReaderFactory;
+use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Box\Spout\TestUsingResource;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class ReaderTest
- *
- * @package Box\Spout\Reader\XLSX
  */
-class ReaderTest extends \PHPUnit_Framework_TestCase
+class ReaderTest extends TestCase
 {
     use TestUsingResource;
 
@@ -31,13 +30,14 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider dataProviderForTestReadShouldThrowException
-     * @expectedException \Box\Spout\Common\Exception\IOException
      *
      * @param string $filePath
      * @return void
      */
     public function testReadShouldThrowException($filePath)
     {
+        $this->expectException(IOException::class);
+
         // using @ to prevent warnings/errors from being displayed
         @$this->getAllRowsForFile($filePath);
     }
@@ -51,7 +51,7 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
             ['one_sheet_with_shared_strings.xlsx', 5, 5],
             ['one_sheet_with_inline_strings.xlsx', 5, 5],
             ['two_sheets_with_shared_strings.xlsx', 10, 5],
-            ['two_sheets_with_inline_strings.xlsx', 10, 5]
+            ['two_sheets_with_inline_strings.xlsx', 10, 5],
         ];
     }
 
@@ -67,9 +67,9 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
     {
         $allRows = $this->getAllRowsForFile($resourceName);
 
-        $this->assertEquals($expectedNumOfRows, count($allRows), "There should be $expectedNumOfRows rows");
+        $this->assertCount($expectedNumOfRows, $allRows, "There should be $expectedNumOfRows rows");
         foreach ($allRows as $row) {
-            $this->assertEquals($expectedNumOfCellsPerRow, count($row), "There should be $expectedNumOfCellsPerRow cells for every row");
+            $this->assertCount($expectedNumOfCellsPerRow, $row, "There should be $expectedNumOfCellsPerRow cells for every row");
         }
     }
 
@@ -173,6 +173,23 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @return void
      */
+    public function testReadShouldSupportFilesWithCapitalSharedStringsFileName()
+    {
+        $allRows = $this->getAllRowsForFile('one_sheet_with_capital_shared_strings_filename.xlsx');
+
+        $expectedRows = [
+            ['s1--A1', 's1--B1', 's1--C1', 's1--D1', 's1--E1'],
+            ['s1--A2', 's1--B2', 's1--C2', 's1--D2', 's1--E2'],
+            ['s1--A3', 's1--B3', 's1--C3', 's1--D3', 's1--E3'],
+            ['s1--A4', 's1--B4', 's1--C4', 's1--D4', 's1--E4'],
+            ['s1--A5', 's1--B5', 's1--C5', 's1--D5', 's1--E5'],
+        ];
+        $this->assertEquals($expectedRows, $allRows);
+    }
+
+    /**
+     * @return void
+     */
     public function testReadShouldSupportFilesWithoutCellReference()
     {
         // file where the cell definition does not have a "r" attribute
@@ -221,7 +238,6 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
                 'weird string', // valid 'str' string
                 null, // invalid date
             ],
-            ['', '', '', '', '', '', '', '', ''],
         ];
         $this->assertEquals($expectedRows, $allRows);
     }
@@ -264,10 +280,35 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
                 \DateTime::createFromFormat('Y-m-d H:i:s', '2015-09-01 22:23:00'),
             ],
             [
-                \DateTime::createFromFormat('Y-m-d H:i:s', '1900-02-28 23:59:59'),
+                \DateTime::createFromFormat('Y-m-d H:i:s', '1900-02-27 23:59:59'),
                 \DateTime::createFromFormat('Y-m-d H:i:s', '1900-03-01 00:00:00'),
-                \DateTime::createFromFormat('Y-m-d H:i:s', '1900-02-28 11:00:00'), // 1900-02-29 should be converted to 1900-02-28
-            ]
+                \DateTime::createFromFormat('Y-m-d H:i:s', '1900-02-28 11:00:00'),
+            ],
+        ];
+        $this->assertEquals($expectedRows, $allRows);
+    }
+
+    /**
+     * @return void
+     */
+    public function testReadShouldSupportDifferentDatesAsNumericTimestampWith1904Calendar()
+    {
+        // make sure dates are always created with the same timezone
+        date_default_timezone_set('UTC');
+
+        $allRows = $this->getAllRowsForFile('sheet_with_different_numeric_value_dates_1904_calendar.xlsx');
+
+        $expectedRows = [
+            [
+                \DateTime::createFromFormat('Y-m-d H:i:s', '2019-09-02 00:00:00'),
+                \DateTime::createFromFormat('Y-m-d H:i:s', '2019-09-03 00:00:00'),
+                \DateTime::createFromFormat('Y-m-d H:i:s', '2019-09-02 22:23:00'),
+            ],
+            [
+                \DateTime::createFromFormat('Y-m-d H:i:s', '1904-02-29 23:59:59'),
+                \DateTime::createFromFormat('Y-m-d H:i:s', '1904-03-02 00:00:00'),
+                \DateTime::createFromFormat('Y-m-d H:i:s', '1904-03-01 11:00:00'),
+            ],
         ];
         $this->assertEquals($expectedRows, $allRows);
     }
@@ -284,12 +325,12 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
 
         $expectedRows = [
             [
-                \DateTime::createFromFormat('Y-m-d H:i:s', '1900-01-01 00:00:00'),
-                \DateTime::createFromFormat('Y-m-d H:i:s', '1900-01-01 11:29:00'),
-                \DateTime::createFromFormat('Y-m-d H:i:s', '1900-01-01 23:29:00'),
-                \DateTime::createFromFormat('Y-m-d H:i:s', '1900-01-01 01:42:25'),
-                \DateTime::createFromFormat('Y-m-d H:i:s', '1900-01-01 13:42:25'),
-            ]
+                \DateTime::createFromFormat('Y-m-d H:i:s', '1899-12-30 00:00:00'),
+                \DateTime::createFromFormat('Y-m-d H:i:s', '1899-12-30 11:29:00'),
+                \DateTime::createFromFormat('Y-m-d H:i:s', '1899-12-30 23:29:00'),
+                \DateTime::createFromFormat('Y-m-d H:i:s', '1899-12-30 01:42:25'),
+                \DateTime::createFromFormat('Y-m-d H:i:s', '1899-12-30 13:42:25'),
+            ],
         ];
         $this->assertEquals($expectedRows, $allRows);
     }
@@ -332,9 +373,9 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
     {
         $allRows = $this->getAllRowsForFile('sheet_without_dimensions_but_spans_and_empty_cells.xlsx');
 
-        $this->assertEquals(2, count($allRows), 'There should be 2 rows');
+        $this->assertCount(2, $allRows, 'There should be 2 rows');
         foreach ($allRows as $row) {
-            $this->assertEquals(5, count($row), 'There should be 5 cells for every row, because empty rows should be preserved');
+            $this->assertCount(5, $row, 'There should be 5 cells for every row, because empty rows should be preserved');
         }
 
         $expectedRows = [
@@ -351,9 +392,9 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
     {
         $allRows = $this->getAllRowsForFile('sheet_without_dimensions_and_empty_cells.xlsx');
 
-        $this->assertEquals(2, count($allRows), 'There should be 2 rows');
-        $this->assertEquals(5, count($allRows[0]), 'There should be 5 cells in the first row');
-        $this->assertEquals(3, count($allRows[1]), 'There should be only 3 cells in the second row, because empty rows at the end should be skip');
+        $this->assertCount(2, $allRows, 'There should be 2 rows');
+        $this->assertCount(5, $allRows[0], 'There should be 5 cells in the first row');
+        $this->assertCount(3, $allRows[1], 'There should be only 3 cells in the second row, because empty rows at the end should be skip');
 
         $expectedRows = [
             ['s1--A1', 's1--B1', 's1--C1', 's1--D1', 's1--E1'],
@@ -369,9 +410,9 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
     {
         $allRows = $this->getAllRowsForFile('sheet_without_dimensions_and_empty_cells.xlsx');
 
-        $this->assertEquals(2, count($allRows), 'There should be 2 rows');
-        $this->assertEquals(5, count($allRows[0]), 'There should be 5 cells in the first row');
-        $this->assertEquals(3, count($allRows[1]), 'There should be only 3 cells in the second row, because empty rows at the end should be skip');
+        $this->assertCount(2, $allRows, 'There should be 2 rows');
+        $this->assertCount(5, $allRows[0], 'There should be 5 cells in the first row');
+        $this->assertCount(3, $allRows[1], 'There should be only 3 cells in the second row, because empty rows at the end should be skip');
 
         $expectedRows = [
             ['s1--A1', 's1--B1', 's1--C1', 's1--D1', 's1--E1'],
@@ -387,7 +428,7 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
     {
         $allRows = $this->getAllRowsForFile('sheet_with_empty_rows_and_missing_row_index.xlsx');
 
-        $this->assertEquals(3, count($allRows), 'There should be only 3 rows, because the empty rows are skipped');
+        $this->assertCount(3, $allRows, 'There should be only 3 rows, because the empty rows are skipped');
 
         $expectedRows = [
             // skipped row here
@@ -407,13 +448,13 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
     {
         $allRows = $this->getAllRowsForFile('sheet_with_empty_rows_and_missing_row_index.xlsx', false, true);
 
-        $this->assertEquals(6, count($allRows), 'There should be 6 rows');
+        $this->assertCount(6, $allRows, 'There should be 6 rows');
 
         $expectedRows = [
-            [''],
+            [],
             ['s1--A2', 's1--B2', 's1--C2'],
-            [''],
-            [''],
+            [],
+            [],
             ['s1--A5', 's1--B5', 's1--C5'],
             ['s1--A6', 's1--B6', 's1--C6'],
         ];
@@ -529,7 +570,7 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
         $allRows = [];
         $resourcePath = $this->getResourcePath('two_sheets_with_inline_strings.xlsx');
 
-        $reader = ReaderFactory::create(Type::XLSX);
+        $reader = ReaderEntityFactory::createReader(Type::XLSX);
         $reader->open($resourcePath);
 
         foreach ($reader->getSheetIterator() as $sheet) {
@@ -539,14 +580,14 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
         foreach ($reader->getSheetIterator() as $sheet) {
             // this loop should only add the first row of the first sheet
             foreach ($sheet->getRowIterator() as $row) {
-                $allRows[] = $row;
+                $allRows[] = $row->toArray();
                 break;
             }
 
             // this loop should rewind the iterator and restart reading from the 1st row again
             // therefore, it should only add the first row of the first sheet
             foreach ($sheet->getRowIterator() as $row) {
-                $allRows[] = $row;
+                $allRows[] = $row->toArray();
                 break;
             }
 
@@ -557,7 +598,7 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
         foreach ($reader->getSheetIterator() as $sheet) {
             // this loop should only add the first row of the current sheet
             foreach ($sheet->getRowIterator() as $row) {
-                $allRows[] = $row;
+                $allRows[] = $row->toArray();
                 break;
             }
 
@@ -576,26 +617,26 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Box\Spout\Common\Exception\IOException
-     *
      * @return void
      */
     public function testReadWithUnsupportedCustomStreamWrapper()
     {
+        $this->expectException(IOException::class);
+
         /** @var \Box\Spout\Reader\XLSX\Reader $reader */
-        $reader = ReaderFactory::create(Type::XLSX);
+        $reader = ReaderEntityFactory::createReader(Type::XLSX);
         $reader->open('unsupported://foobar');
     }
 
     /**
-     * @expectedException \Box\Spout\Common\Exception\IOException
-     *
      * @return void
      */
     public function testReadWithSupportedCustomStreamWrapper()
     {
+        $this->expectException(IOException::class);
+
         /** @var \Box\Spout\Reader\XLSX\Reader $reader */
-        $reader = ReaderFactory::create(Type::XLSX);
+        $reader = ReaderEntityFactory::createReader(Type::XLSX);
         $reader->open('php://memory');
     }
 
@@ -610,7 +651,7 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
         $expectedRows = [
             ['A', 'B', 'C'],
             ['1', '2', '3'],
-            ['0', '0', '0']
+            ['0', '0', '0'],
         ];
         $this->assertEquals($expectedRows, $allRows, 'There should be only 3 rows, because zeros (0) are valid values');
     }
@@ -626,11 +667,10 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
         $expectedRows = [
             ['A', 'B', 'C'],
             ['0', '', ''],
-            ['1', '1', '']
+            ['1', '1', ''],
         ];
         $this->assertEquals($expectedRows, $allRows, 'There should be 3 rows, with equal length');
     }
-
 
     /**
      * https://github.com/box/spout/issues/195
@@ -649,11 +689,10 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedRows, $allRows, 'Cell values should not be trimmed');
     }
 
-
     /**
      * @param string $fileName
-     * @param bool|void $shouldFormatDates
-     * @param bool|void $shouldPreserveEmptyRows
+     * @param bool $shouldFormatDates
+     * @param bool $shouldPreserveEmptyRows
      * @return array All the read rows the given file
      */
     private function getAllRowsForFile($fileName, $shouldFormatDates = false, $shouldPreserveEmptyRows = false)
@@ -662,14 +701,14 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
         $resourcePath = $this->getResourcePath($fileName);
 
         /** @var \Box\Spout\Reader\XLSX\Reader $reader */
-        $reader = ReaderFactory::create(Type::XLSX);
+        $reader = ReaderEntityFactory::createReader(Type::XLSX);
         $reader->setShouldFormatDates($shouldFormatDates);
         $reader->setShouldPreserveEmptyRows($shouldPreserveEmptyRows);
         $reader->open($resourcePath);
 
         foreach ($reader->getSheetIterator() as $sheetIndex => $sheet) {
             foreach ($sheet->getRowIterator() as $rowIndex => $row) {
-                $allRows[] = $row;
+                $allRows[] = $row->toArray();
             }
         }
 
