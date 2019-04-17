@@ -1,23 +1,23 @@
 <?php
 
-namespace Box\Spout\Writer\Common\Creator;
+namespace WilsonGlasser\Spout\Writer\Common\Creator;
 
-use Box\Spout\Common\Creator\HelperFactory;
-use Box\Spout\Common\Exception\UnsupportedTypeException;
-use Box\Spout\Common\Helper\GlobalFunctionsHelper;
-use Box\Spout\Common\Type;
-use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
-use Box\Spout\Writer\CSV\Manager\OptionsManager as CSVOptionsManager;
-use Box\Spout\Writer\CSV\Writer as CSVWriter;
-use Box\Spout\Writer\ODS\Creator\HelperFactory as ODSHelperFactory;
-use Box\Spout\Writer\ODS\Creator\ManagerFactory as ODSManagerFactory;
-use Box\Spout\Writer\ODS\Manager\OptionsManager as ODSOptionsManager;
-use Box\Spout\Writer\ODS\Writer as ODSWriter;
-use Box\Spout\Writer\WriterInterface;
-use Box\Spout\Writer\XLSX\Creator\HelperFactory as XLSXHelperFactory;
-use Box\Spout\Writer\XLSX\Creator\ManagerFactory as XLSXManagerFactory;
-use Box\Spout\Writer\XLSX\Manager\OptionsManager as XLSXOptionsManager;
-use Box\Spout\Writer\XLSX\Writer as XLSXWriter;
+use WilsonGlasser\Spout\Common\Creator\HelperFactory;
+use WilsonGlasser\Spout\Common\Exception\UnsupportedTypeException;
+use WilsonGlasser\Spout\Common\Helper\GlobalFunctionsHelper;
+use WilsonGlasser\Spout\Common\Type;
+use WilsonGlasser\Spout\Writer\Common\Creator\Style\StyleBuilder;
+use WilsonGlasser\Spout\Writer\CSV\Manager\OptionsManager as CSVOptionsManager;
+use WilsonGlasser\Spout\Writer\CSV\Writer as CSVWriter;
+use WilsonGlasser\Spout\Writer\ODS\Creator\HelperFactory as ODSHelperFactory;
+use WilsonGlasser\Spout\Writer\ODS\Creator\ManagerFactory as ODSManagerFactory;
+use WilsonGlasser\Spout\Writer\ODS\Manager\OptionsManager as ODSOptionsManager;
+use WilsonGlasser\Spout\Writer\ODS\Writer as ODSWriter;
+use WilsonGlasser\Spout\Writer\WriterInterface;
+use WilsonGlasser\Spout\Writer\XLSX\Creator\HelperFactory as XLSXHelperFactory;
+use WilsonGlasser\Spout\Writer\XLSX\Creator\ManagerFactory as XLSXManagerFactory;
+use WilsonGlasser\Spout\Writer\XLSX\Manager\OptionsManager as XLSXOptionsManager;
+use WilsonGlasser\Spout\Writer\XLSX\Writer as XLSXWriter;
 
 /**
  * Class WriterFactory
@@ -30,7 +30,7 @@ class WriterFactory
      * This creates an instance of the appropriate writer, given the type of the file to be read
      *
      * @param  string $writerType Type of the writer to instantiate
-     * @throws \Box\Spout\Common\Exception\UnsupportedTypeException
+     * @throws \WilsonGlasser\Spout\Common\Exception\UnsupportedTypeException
      * @return WriterInterface
      */
     public function create($writerType)

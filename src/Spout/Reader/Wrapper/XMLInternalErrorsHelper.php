@@ -1,8 +1,8 @@
 <?php
 
-namespace Box\Spout\Reader\Wrapper;
+namespace WilsonGlasser\Spout\Reader\Wrapper;
 
-use Box\Spout\Reader\Exception\XMLProcessingException;
+use WilsonGlasser\Spout\Reader\Exception\XMLProcessingException;
 
 /**
  * Trait XMLInternalErrorsHelper
@@ -28,7 +28,7 @@ trait XMLInternalErrorsHelper
      * Throws an XMLProcessingException if an error occured.
      * It also always resets the "libxml_use_internal_errors" setting back to its initial value.
      *
-     * @throws \Box\Spout\Reader\Exception\XMLProcessingException
+     * @throws \WilsonGlasser\Spout\Reader\Exception\XMLProcessingException
      * @return void
      */
     protected function resetXMLInternalErrorsSettingAndThrowIfXMLErrorOccured()

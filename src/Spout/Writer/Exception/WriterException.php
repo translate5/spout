@@ -1,8 +1,8 @@
 <?php
 
-namespace Box\Spout\Writer\Exception;
+namespace WilsonGlasser\Spout\Writer\Exception;
 
-use Box\Spout\Common\Exception\SpoutException;
+use WilsonGlasser\Spout\Common\Exception\SpoutException;
 
 /**
  * Class WriterException

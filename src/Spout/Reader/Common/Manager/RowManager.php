@@ -1,9 +1,9 @@
 <?php
 
-namespace Box\Spout\Reader\Common\Manager;
+namespace WilsonGlasser\Spout\Reader\Common\Manager;
 
-use Box\Spout\Common\Entity\Row;
-use Box\Spout\Reader\Common\Creator\InternalEntityFactoryInterface;
+use WilsonGlasser\Spout\Common\Entity\Row;
+use WilsonGlasser\Spout\Reader\Common\Creator\InternalEntityFactoryInterface;
 
 /**
  * Class RowManager

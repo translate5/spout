@@ -1,8 +1,8 @@
 <?php
 
-namespace Box\Spout\Common\Entity;
+namespace WilsonGlasser\Spout\Common\Entity;
 
-use Box\Spout\Common\Entity\Style\Style;
+use WilsonGlasser\Spout\Common\Entity\Style\Style;
 
 class Row
 {

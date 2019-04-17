@@ -1,8 +1,8 @@
 <?php
 
-namespace Box\Spout\Writer\Common\Manager;
+namespace WilsonGlasser\Spout\Writer\Common\Manager;
 
-use Box\Spout\Common\Entity\Row;
+use WilsonGlasser\Spout\Common\Entity\Row;
 
 class RowManager
 {

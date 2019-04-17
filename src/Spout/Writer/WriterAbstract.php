@@ -1,18 +1,18 @@
 <?php
 
-namespace Box\Spout\Writer;
+namespace WilsonGlasser\Spout\Writer;
 
-use Box\Spout\Common\Creator\HelperFactory;
-use Box\Spout\Common\Entity\Row;
-use Box\Spout\Common\Entity\Style\Style;
-use Box\Spout\Common\Exception\InvalidArgumentException;
-use Box\Spout\Common\Exception\IOException;
-use Box\Spout\Common\Exception\SpoutException;
-use Box\Spout\Common\Helper\GlobalFunctionsHelper;
-use Box\Spout\Common\Manager\OptionsManagerInterface;
-use Box\Spout\Writer\Common\Entity\Options;
-use Box\Spout\Writer\Exception\WriterAlreadyOpenedException;
-use Box\Spout\Writer\Exception\WriterNotOpenedException;
+use WilsonGlasser\Spout\Common\Creator\HelperFactory;
+use WilsonGlasser\Spout\Common\Entity\Row;
+use WilsonGlasser\Spout\Common\Entity\Style\Style;
+use WilsonGlasser\Spout\Common\Exception\InvalidArgumentException;
+use WilsonGlasser\Spout\Common\Exception\IOException;
+use WilsonGlasser\Spout\Common\Exception\SpoutException;
+use WilsonGlasser\Spout\Common\Helper\GlobalFunctionsHelper;
+use WilsonGlasser\Spout\Common\Manager\OptionsManagerInterface;
+use WilsonGlasser\Spout\Writer\Common\Entity\Options;
+use WilsonGlasser\Spout\Writer\Exception\WriterAlreadyOpenedException;
+use WilsonGlasser\Spout\Writer\Exception\WriterNotOpenedException;
 
 /**
  * Class WriterAbstract
@@ -68,12 +68,13 @@ abstract class WriterAbstract implements WriterInterface
     /**
      * Adds a row to the currently opened writer.
      *
-     * @param Row $row The row containing cells and styles
+     * @param Row|array $row The row containing cells and styles
      * @throws WriterNotOpenedException If the workbook is not created yet
      * @throws IOException If unable to write data
      * @return void
      */
-    abstract protected function addRowToWriter(Row $row);
+    abstract protected function addRowToWriter($row);
+
 
     /**
      * Closes the streamer, preventing any additional writing.
@@ -175,7 +176,7 @@ abstract class WriterAbstract implements WriterInterface
     /**
      * {@inheritdoc}
      */
-    public function addRow(Row $row)
+    public function addRow($row)
     {
         if ($this->isWriterOpened) {
             try {
@@ -201,7 +202,7 @@ abstract class WriterAbstract implements WriterInterface
     public function addRows(array $rows)
     {
         foreach ($rows as $row) {
-            if (!$row instanceof Row) {
+            if (!$row instanceof Row && !is_array($row)) {
                 $this->closeAndAttemptToCleanupAllFiles();
                 throw new InvalidArgumentException('The input should be an array of Row');
             }

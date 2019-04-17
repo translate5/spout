@@ -1,8 +1,8 @@
 <?php
 
-namespace Box\Spout\Writer\Common\Manager\Style;
+namespace WilsonGlasser\Spout\Writer\Common\Manager\Style;
 
-use Box\Spout\Common\Entity\Style\Style;
+use WilsonGlasser\Spout\Common\Entity\Style\Style;
 
 /**
  * Class StyleRegistry

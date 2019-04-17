@@ -1,10 +1,10 @@
 <?php
 
-namespace Box\Spout\Writer\Common\Manager;
+namespace WilsonGlasser\Spout\Writer\Common\Manager;
 
-use Box\Spout\Common\Entity\Cell;
-use Box\Spout\Common\Entity\Style\Style;
-use Box\Spout\Writer\Common\Manager\Style\StyleMerger;
+use WilsonGlasser\Spout\Common\Entity\Cell;
+use WilsonGlasser\Spout\Common\Entity\Style\Style;
+use WilsonGlasser\Spout\Writer\Common\Manager\Style\StyleMerger;
 
 class CellManager
 {

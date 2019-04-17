@@ -1,8 +1,8 @@
 <?php
 
-namespace Box\Spout\Writer\Common\Helper;
+namespace WilsonGlasser\Spout\Writer\Common\Helper;
 
-use Box\Spout\Writer\Common\Creator\InternalEntityFactory;
+use WilsonGlasser\Spout\Writer\Common\Creator\InternalEntityFactory;
 
 /**
  * Class ZipHelper

@@ -1,14 +1,14 @@
 <?php
 
-namespace Box\Spout\Writer\Common\Manager;
+namespace WilsonGlasser\Spout\Writer\Common\Manager;
 
-use Box\Spout\Common\Entity\Row;
-use Box\Spout\Common\Exception\IOException;
-use Box\Spout\Writer\Common\Entity\Sheet;
-use Box\Spout\Writer\Common\Entity\Workbook;
-use Box\Spout\Writer\Common\Entity\Worksheet;
-use Box\Spout\Writer\Exception\SheetNotFoundException;
-use Box\Spout\Writer\Exception\WriterException;
+use WilsonGlasser\Spout\Common\Entity\Row;
+use WilsonGlasser\Spout\Common\Exception\IOException;
+use WilsonGlasser\Spout\Writer\Common\Entity\Sheet;
+use WilsonGlasser\Spout\Writer\Common\Entity\Workbook;
+use WilsonGlasser\Spout\Writer\Common\Entity\Worksheet;
+use WilsonGlasser\Spout\Writer\Exception\SheetNotFoundException;
+use WilsonGlasser\Spout\Writer\Exception\WriterException;
 
 /**
  * Interface WorkbookManagerInterface
@@ -57,12 +57,12 @@ interface WorkbookManagerInterface
      * If shouldCreateNewSheetsAutomatically option is set to true, it will handle pagination
      * with the creation of new worksheets if one worksheet has reached its maximum capicity.
      *
-     * @param Row $row The row to be added
+     * @param Row|array $row The row to be added
      * @throws IOException If trying to create a new sheet and unable to open the sheet for writing
      * @throws WriterException If unable to write data
      * @return void
      */
-    public function addRowToCurrentWorksheet(Row $row);
+    public function addRowToCurrentWorksheet($row);
 
     /**
      * Closes the workbook and all its associated sheets.

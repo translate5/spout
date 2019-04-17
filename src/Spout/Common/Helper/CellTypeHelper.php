@@ -1,6 +1,6 @@
 <?php
 
-namespace Box\Spout\Common\Helper;
+namespace WilsonGlasser\Spout\Common\Helper;
 
 /**
  * Class CellTypeHelper
@@ -65,4 +65,5 @@ class CellTypeHelper
             $value instanceof \DateInterval
         );
     }
+
 }

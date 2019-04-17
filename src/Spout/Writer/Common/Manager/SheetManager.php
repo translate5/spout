@@ -1,10 +1,10 @@
 <?php
 
-namespace Box\Spout\Writer\Common\Manager;
+namespace WilsonGlasser\Spout\Writer\Common\Manager;
 
-use Box\Spout\Common\Helper\StringHelper;
-use Box\Spout\Writer\Common\Entity\Sheet;
-use Box\Spout\Writer\Exception\InvalidSheetNameException;
+use WilsonGlasser\Spout\Common\Helper\StringHelper;
+use WilsonGlasser\Spout\Writer\Common\Entity\Sheet;
+use WilsonGlasser\Spout\Writer\Exception\InvalidSheetNameException;
 
 /**
  * Class SheetManager
@@ -21,26 +21,13 @@ class SheetManager
     /** @var array Associative array [WORKBOOK_ID] => [[SHEET_INDEX] => [SHEET_NAME]] keeping track of sheets' name to enforce uniqueness per workbook */
     private static $SHEETS_NAME_USED = [];
 
-    /** @var StringHelper */
-    private $stringHelper;
-
-    /**
-     * SheetManager constructor.
-     *
-     * @param StringHelper $stringHelper
-     */
-    public function __construct(StringHelper $stringHelper)
-    {
-        $this->stringHelper = $stringHelper;
-    }
-
     /**
      * Throws an exception if the given sheet's name is not valid.
      * @see Sheet::setName for validity rules.
      *
      * @param string $name
      * @param Sheet $sheet The sheet whose future name is checked
-     * @throws \Box\Spout\Writer\Exception\InvalidSheetNameException If the sheet's name is invalid.
+     * @throws \WilsonGlasser\Spout\Writer\Exception\InvalidSheetNameException If the sheet's name is invalid.
      * @return void
      */
     public function throwIfNameIsInvalid($name, Sheet $sheet)
@@ -52,7 +39,7 @@ class SheetManager
         }
 
         $failedRequirements = [];
-        $nameLength = $this->stringHelper->getStringLength($name);
+        $nameLength = StringHelper::getStringLength($name);
 
         if (!$this->isNameUnique($name, $sheet)) {
             $failedRequirements[] = 'It should be unique';
@@ -101,8 +88,8 @@ class SheetManager
      */
     private function doesStartOrEndWithSingleQuote($name)
     {
-        $startsWithSingleQuote = ($this->stringHelper->getCharFirstOccurrencePosition('\'', $name) === 0);
-        $endsWithSingleQuote = ($this->stringHelper->getCharLastOccurrencePosition('\'', $name) === ($this->stringHelper->getStringLength($name) - 1));
+        $startsWithSingleQuote = (StringHelper::getCharFirstOccurrencePosition('\'', $name) === 0);
+        $endsWithSingleQuote = (StringHelper::getCharLastOccurrencePosition('\'', $name) === (StringHelper::getStringLength($name) - 1));
 
         return ($startsWithSingleQuote || $endsWithSingleQuote);
     }

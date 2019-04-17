@@ -1,17 +1,17 @@
 <?php
 
-namespace Box\Spout\Reader\XLSX\Creator;
+namespace WilsonGlasser\Spout\Reader\XLSX\Creator;
 
-use Box\Spout\Common\Entity\Cell;
-use Box\Spout\Common\Entity\Row;
-use Box\Spout\Reader\Common\Creator\InternalEntityFactoryInterface;
-use Box\Spout\Reader\Common\Entity\Options;
-use Box\Spout\Reader\Common\XMLProcessor;
-use Box\Spout\Reader\Wrapper\XMLReader;
-use Box\Spout\Reader\XLSX\Manager\SharedStringsManager;
-use Box\Spout\Reader\XLSX\RowIterator;
-use Box\Spout\Reader\XLSX\Sheet;
-use Box\Spout\Reader\XLSX\SheetIterator;
+use WilsonGlasser\Spout\Common\Entity\Cell;
+use WilsonGlasser\Spout\Common\Entity\Row;
+use WilsonGlasser\Spout\Reader\Common\Creator\InternalEntityFactoryInterface;
+use WilsonGlasser\Spout\Reader\Common\Entity\Options;
+use WilsonGlasser\Spout\Reader\Common\XMLProcessor;
+use WilsonGlasser\Spout\Reader\Wrapper\XMLReader;
+use WilsonGlasser\Spout\Reader\XLSX\Manager\SharedStringsManager;
+use WilsonGlasser\Spout\Reader\XLSX\RowIterator;
+use WilsonGlasser\Spout\Reader\XLSX\Sheet;
+use WilsonGlasser\Spout\Reader\XLSX\SheetIterator;
 
 /**
  * Class InternalEntityFactory
@@ -37,7 +37,7 @@ class InternalEntityFactory implements InternalEntityFactoryInterface
 
     /**
      * @param string $filePath Path of the file to be read
-     * @param \Box\Spout\Common\Manager\OptionsManagerInterface $optionsManager Reader's options manager
+     * @param \WilsonGlasser\Spout\Common\Manager\OptionsManagerInterface $optionsManager Reader's options manager
      * @param SharedStringsManager $sharedStringsManager Manages shared strings
      * @return SheetIterator
      */
@@ -60,7 +60,7 @@ class InternalEntityFactory implements InternalEntityFactoryInterface
      * @param string $sheetName Name of the sheet
      * @param bool $isSheetActive Whether the sheet was defined as active
      * @param bool $isSheetVisible Whether the sheet is visible
-     * @param \Box\Spout\Common\Manager\OptionsManagerInterface $optionsManager Reader's options manager
+     * @param \WilsonGlasser\Spout\Common\Manager\OptionsManagerInterface $optionsManager Reader's options manager
      * @param SharedStringsManager $sharedStringsManager Manages shared strings
      * @return Sheet
      */
@@ -82,7 +82,7 @@ class InternalEntityFactory implements InternalEntityFactoryInterface
     /**
      * @param string $filePath Path of the XLSX file being read
      * @param string $sheetDataXMLFilePath Path of the sheet data XML file as in [Content_Types].xml
-     * @param \Box\Spout\Common\Manager\OptionsManagerInterface $optionsManager Reader's options manager
+     * @param \WilsonGlasser\Spout\Common\Manager\OptionsManagerInterface $optionsManager Reader's options manager
      * @param SharedStringsManager $sharedStringsManager Manages shared strings
      * @return RowIterator
      */

@@ -1,19 +1,20 @@
 <?php
 
-namespace Box\Spout\Writer\XLSX\Creator;
+namespace WilsonGlasser\Spout\Writer\XLSX\Creator;
 
-use Box\Spout\Common\Manager\OptionsManagerInterface;
-use Box\Spout\Writer\Common\Creator\InternalEntityFactory;
-use Box\Spout\Writer\Common\Creator\ManagerFactoryInterface;
-use Box\Spout\Writer\Common\Entity\Options;
-use Box\Spout\Writer\Common\Manager\RowManager;
-use Box\Spout\Writer\Common\Manager\SheetManager;
-use Box\Spout\Writer\Common\Manager\Style\StyleMerger;
-use Box\Spout\Writer\XLSX\Manager\SharedStringsManager;
-use Box\Spout\Writer\XLSX\Manager\Style\StyleManager;
-use Box\Spout\Writer\XLSX\Manager\Style\StyleRegistry;
-use Box\Spout\Writer\XLSX\Manager\WorkbookManager;
-use Box\Spout\Writer\XLSX\Manager\WorksheetManager;
+use WilsonGlasser\Spout\Common\Manager\OptionsManagerInterface;
+use WilsonGlasser\Spout\Writer\Common\Creator\InternalEntityFactory;
+use WilsonGlasser\Spout\Writer\Common\Creator\ManagerFactoryInterface;
+use WilsonGlasser\Spout\Writer\Common\Entity\Options;
+use WilsonGlasser\Spout\Writer\Common\Manager\RowManager;
+use WilsonGlasser\Spout\Writer\Common\Manager\SheetManager;
+use WilsonGlasser\Spout\Writer\Common\Manager\Style\StyleMerger;
+use WilsonGlasser\Spout\Writer\XLSX\Manager\Comment\CommentManager;
+use WilsonGlasser\Spout\Writer\XLSX\Manager\SharedStringsManager;
+use WilsonGlasser\Spout\Writer\XLSX\Manager\Style\StyleManager;
+use WilsonGlasser\Spout\Writer\XLSX\Manager\Style\StyleRegistry;
+use WilsonGlasser\Spout\Writer\XLSX\Manager\WorkbookManager;
+use WilsonGlasser\Spout\Writer\XLSX\Manager\WorksheetManager;
 
 /**
  * Class ManagerFactory
@@ -55,10 +56,14 @@ class ManagerFactory implements ManagerFactoryInterface
         $styleManager = $this->createStyleManager($optionsManager);
         $worksheetManager = $this->createWorksheetManager($optionsManager, $styleManager, $styleMerger, $sharedStringsManager);
 
+        $stringsEscaper = $this->helperFactory->createStringsEscaper();
+        $commentsManager = $this->createCommentsManager($stringsEscaper);
+
         return new WorkbookManager(
             $workbook,
             $optionsManager,
             $worksheetManager,
+            $commentsManager,
             $styleManager,
             $styleMerger,
             $fileSystemHelper,
@@ -69,7 +74,7 @@ class ManagerFactory implements ManagerFactoryInterface
 
     /**
      * @param OptionsManagerInterface $optionsManager
-     * @param StyleManager $styleManager
+     * @param Stylemanager $styleManager
      * @param StyleMerger $styleMerger
      * @param SharedStringsManager $sharedStringsManager
      * @return WorksheetManager
@@ -82,7 +87,6 @@ class ManagerFactory implements ManagerFactoryInterface
     ) {
         $rowManager = $this->createRowManager();
         $stringsEscaper = $this->helperFactory->createStringsEscaper();
-        $stringsHelper = $this->helperFactory->createStringHelper();
 
         return new WorksheetManager(
             $optionsManager,
@@ -91,7 +95,6 @@ class ManagerFactory implements ManagerFactoryInterface
             $styleMerger,
             $sharedStringsManager,
             $stringsEscaper,
-            $stringsHelper,
             $this->entityFactory
         );
     }
@@ -101,9 +104,16 @@ class ManagerFactory implements ManagerFactoryInterface
      */
     public function createSheetManager()
     {
-        $stringHelper = $this->helperFactory->createStringHelper();
+        return new SheetManager();
+    }
 
-        return new SheetManager($stringHelper);
+
+    /**
+     * @return CommentManager
+     */
+    public function createCommentsManager($stringsEscaper)
+    {
+        return new CommentManager($stringsEscaper);
     }
 
     /**

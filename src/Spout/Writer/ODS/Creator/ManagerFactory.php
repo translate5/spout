@@ -1,17 +1,17 @@
 <?php
 
-namespace Box\Spout\Writer\ODS\Creator;
+namespace WilsonGlasser\Spout\Writer\ODS\Creator;
 
-use Box\Spout\Common\Manager\OptionsManagerInterface;
-use Box\Spout\Writer\Common\Creator\InternalEntityFactory;
-use Box\Spout\Writer\Common\Creator\ManagerFactoryInterface;
-use Box\Spout\Writer\Common\Entity\Options;
-use Box\Spout\Writer\Common\Manager\SheetManager;
-use Box\Spout\Writer\Common\Manager\Style\StyleMerger;
-use Box\Spout\Writer\ODS\Manager\Style\StyleManager;
-use Box\Spout\Writer\ODS\Manager\Style\StyleRegistry;
-use Box\Spout\Writer\ODS\Manager\WorkbookManager;
-use Box\Spout\Writer\ODS\Manager\WorksheetManager;
+use WilsonGlasser\Spout\Common\Manager\OptionsManagerInterface;
+use WilsonGlasser\Spout\Writer\Common\Creator\InternalEntityFactory;
+use WilsonGlasser\Spout\Writer\Common\Creator\ManagerFactoryInterface;
+use WilsonGlasser\Spout\Writer\Common\Entity\Options;
+use WilsonGlasser\Spout\Writer\Common\Manager\SheetManager;
+use WilsonGlasser\Spout\Writer\Common\Manager\Style\StyleMerger;
+use WilsonGlasser\Spout\Writer\ODS\Manager\Style\StyleManager;
+use WilsonGlasser\Spout\Writer\ODS\Manager\Style\StyleRegistry;
+use WilsonGlasser\Spout\Writer\ODS\Manager\WorkbookManager;
+use WilsonGlasser\Spout\Writer\ODS\Manager\WorksheetManager;
 
 /**
  * Class ManagerFactory
@@ -70,9 +70,8 @@ class ManagerFactory implements ManagerFactoryInterface
     private function createWorksheetManager(StyleManager $styleManager, StyleMerger $styleMerger)
     {
         $stringsEscaper = $this->helperFactory->createStringsEscaper();
-        $stringsHelper = $this->helperFactory->createStringHelper();
 
-        return new WorksheetManager($styleManager, $styleMerger, $stringsEscaper, $stringsHelper);
+        return new WorksheetManager($styleManager, $styleMerger, $stringsEscaper);
     }
 
     /**
@@ -80,9 +79,8 @@ class ManagerFactory implements ManagerFactoryInterface
      */
     public function createSheetManager()
     {
-        $stringHelper = $this->helperFactory->createStringHelper();
 
-        return new SheetManager($stringHelper);
+        return new SheetManager();
     }
 
     /**

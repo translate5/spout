@@ -1,20 +1,19 @@
 <?php
 
-namespace Box\Spout\Writer\XLSX\Creator;
+namespace WilsonGlasser\Spout\Writer\XLSX\Creator;
 
-use Box\Spout\Common\Helper\Escaper;
-use Box\Spout\Common\Helper\StringHelper;
-use Box\Spout\Common\Manager\OptionsManagerInterface;
-use Box\Spout\Writer\Common\Creator\InternalEntityFactory;
-use Box\Spout\Writer\Common\Entity\Options;
-use Box\Spout\Writer\Common\Helper\ZipHelper;
-use Box\Spout\Writer\XLSX\Helper\FileSystemHelper;
+use WilsonGlasser\Spout\Common\Helper\Escaper;
+use WilsonGlasser\Spout\Common\Manager\OptionsManagerInterface;
+use WilsonGlasser\Spout\Writer\Common\Creator\InternalEntityFactory;
+use WilsonGlasser\Spout\Writer\Common\Entity\Options;
+use WilsonGlasser\Spout\Writer\Common\Helper\ZipHelper;
+use WilsonGlasser\Spout\Writer\XLSX\Helper\FileSystemHelper;
 
 /**
  * Class HelperFactory
  * Factory for helpers needed by the XLSX Writer
  */
-class HelperFactory extends \Box\Spout\Common\Creator\HelperFactory
+class HelperFactory extends \WilsonGlasser\Spout\Common\Creator\HelperFactory
 {
     /**
      * @param OptionsManagerInterface $optionsManager
@@ -47,11 +46,4 @@ class HelperFactory extends \Box\Spout\Common\Creator\HelperFactory
         return new Escaper\XLSX();
     }
 
-    /**
-     * @return StringHelper
-     */
-    public function createStringHelper()
-    {
-        return new StringHelper();
-    }
 }

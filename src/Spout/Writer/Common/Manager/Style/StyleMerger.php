@@ -1,8 +1,8 @@
 <?php
 
-namespace Box\Spout\Writer\Common\Manager\Style;
+namespace WilsonGlasser\Spout\Writer\Common\Manager\Style;
 
-use Box\Spout\Common\Entity\Style\Style;
+use WilsonGlasser\Spout\Common\Entity\Style\Style;
 
 /**
  * Class StyleMerger
@@ -18,12 +18,15 @@ class StyleMerger
      *
      * @NOTE: This function returns a new style.
      *
-     * @param Style $style
-     * @param Style $baseStyle
+     * @param Style|null $style
+     * @param Style|null $baseStyle
      * @return Style New style corresponding to the merge of the 2 styles
      */
-    public function merge(Style $style, Style $baseStyle)
+    public function merge($style, $baseStyle)
     {
+        if ($style === null)
+            return $baseStyle;
+
         $mergedStyle = clone $style;
 
         $this->mergeFontStyles($mergedStyle, $style, $baseStyle);

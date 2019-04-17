@@ -1,9 +1,9 @@
 <?php
 
-namespace Box\Spout\Writer\ODS\Helper;
+namespace WilsonGlasser\Spout\Writer\ODS\Helper;
 
-use Box\Spout\Common\Entity\Style\Border;
-use Box\Spout\Common\Entity\Style\BorderPart;
+use WilsonGlasser\Spout\Common\Entity\Style\Border;
+use WilsonGlasser\Spout\Common\Entity\Style\BorderPart;
 
 /**
  * Class BorderHelper

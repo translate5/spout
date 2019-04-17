@@ -1,6 +1,6 @@
 <?php
 
-namespace Box\Spout\Common\Helper;
+namespace WilsonGlasser\Spout\Common\Helper;
 
 /**
  * Class StringHelper
@@ -11,14 +11,16 @@ namespace Box\Spout\Common\Helper;
 class StringHelper
 {
     /** @var bool Whether the mbstring extension is loaded */
-    protected $hasMbstringSupport;
+    protected static $hasMbstringSupport;
 
     /**
      *
      */
-    public function __construct()
+    public static function hasMbstringSupport()
     {
-        $this->hasMbstringSupport = extension_loaded('mbstring');
+        if (self::$hasMbstringSupport === null)
+            self::$hasMbstringSupport = extension_loaded('mbstring');
+        return self::$hasMbstringSupport;
     }
 
     /**
@@ -30,9 +32,9 @@ class StringHelper
      * @param string $string
      * @return int
      */
-    public function getStringLength($string)
+    public static function getStringLength($string)
     {
-        return $this->hasMbstringSupport ? mb_strlen($string) : strlen($string);
+        return self::hasMbstringSupport() ? mb_strlen($string) : strlen($string);
     }
 
     /**
@@ -45,9 +47,9 @@ class StringHelper
      * @param string $string Haystack
      * @return int Char/substring's first occurrence position within the string if found (starts at 0) or -1 if not found
      */
-    public function getCharFirstOccurrencePosition($char, $string)
+    public static function getCharFirstOccurrencePosition($char, $string)
     {
-        $position = $this->hasMbstringSupport ? mb_strpos($string, $char) : strpos($string, $char);
+        $position = self::hasMbstringSupport() ? mb_strpos($string, $char) : strpos($string, $char);
 
         return ($position !== false) ? $position : -1;
     }
@@ -62,9 +64,9 @@ class StringHelper
      * @param string $string Haystack
      * @return int Char/substring's last occurrence position within the string if found (starts at 0) or -1 if not found
      */
-    public function getCharLastOccurrencePosition($char, $string)
+    public static function getCharLastOccurrencePosition($char, $string)
     {
-        $position = $this->hasMbstringSupport ? mb_strrpos($string, $char) : strrpos($string, $char);
+        $position = self::hasMbstringSupport() ? mb_strrpos($string, $char) : strrpos($string, $char);
 
         return ($position !== false) ? $position : -1;
     }

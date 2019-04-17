@@ -1,18 +1,19 @@
 <?php
 
-namespace Box\Spout\Writer\XLSX\Helper;
+namespace WilsonGlasser\Spout\Writer\XLSX\Helper;
 
-use Box\Spout\Writer\Common\Entity\Worksheet;
-use Box\Spout\Writer\Common\Helper\FileSystemWithRootFolderHelperInterface;
-use Box\Spout\Writer\Common\Helper\ZipHelper;
-use Box\Spout\Writer\XLSX\Manager\Style\StyleManager;
+use WilsonGlasser\Spout\Writer\Common\Entity\Worksheet;
+use WilsonGlasser\Spout\Writer\Common\Helper\FileSystemWithRootFolderHelperInterface;
+use WilsonGlasser\Spout\Writer\Common\Helper\ZipHelper;
+use WilsonGlasser\Spout\Writer\XLSX\Manager\Comment\CommentManager;
+use WilsonGlasser\Spout\Writer\XLSX\Manager\Style\StyleManager;
 
 /**
  * Class FileSystemHelper
  * This class provides helper functions to help with the file system operations
  * like files/folders creation & deletion for XLSX files
  */
-class FileSystemHelper extends \Box\Spout\Common\Helper\FileSystemHelper implements FileSystemWithRootFolderHelperInterface
+class FileSystemHelper extends \WilsonGlasser\Spout\Common\Helper\FileSystemHelper implements FileSystemWithRootFolderHelperInterface
 {
     const APP_NAME = 'Spout';
 
@@ -32,7 +33,7 @@ class FileSystemHelper extends \Box\Spout\Common\Helper\FileSystemHelper impleme
     /** @var ZipHelper Helper to perform tasks with Zip archive */
     private $zipHelper;
 
-    /** @var \Box\Spout\Common\Helper\Escaper\XLSX Used to escape XML data */
+    /** @var \WilsonGlasser\Spout\Common\Helper\Escaper\XLSX Used to escape XML data */
     private $escaper;
 
     /** @var string Path to the root folder inside the temp folder where the files to create the XLSX will be stored */
@@ -53,10 +54,13 @@ class FileSystemHelper extends \Box\Spout\Common\Helper\FileSystemHelper impleme
     /** @var string Path to the "worksheets" folder inside the "xl" folder */
     private $xlWorksheetsFolder;
 
+    /** @var string Path to the "worksheets/_rels" folder inside the "xl" folder */
+    private $xlWorksheetsRelsFolder;
+
     /**
      * @param string $baseFolderPath The path of the base folder where all the I/O can occur
      * @param ZipHelper $zipHelper Helper to perform tasks with Zip archive
-     * @param \Box\Spout\Common\Helper\Escaper\XLSX $escaper Used to escape XML data
+     * @param \WilsonGlasser\Spout\Common\Helper\Escaper\XLSX $escaper Used to escape XML data
      */
     public function __construct($baseFolderPath, $zipHelper, $escaper)
     {
@@ -89,10 +93,19 @@ class FileSystemHelper extends \Box\Spout\Common\Helper\FileSystemHelper impleme
         return $this->xlWorksheetsFolder;
     }
 
+
+    /**
+     * @return string
+     */
+    public function getXlWorksheetsRelsFolder()
+    {
+        return $this->xlWorksheetsRelsFolder;
+    }
+
     /**
      * Creates all the folders needed to create a XLSX file, as well as the files that won't change.
      *
-     * @throws \Box\Spout\Common\Exception\IOException If unable to create at least one of the base folders
+     * @throws \WilsonGlasser\Spout\Common\Exception\IOException If unable to create at least one of the base folders
      * @return void
      */
     public function createBaseFilesAndFolders()
@@ -107,7 +120,7 @@ class FileSystemHelper extends \Box\Spout\Common\Helper\FileSystemHelper impleme
     /**
      * Creates the folder that will be used as root
      *
-     * @throws \Box\Spout\Common\Exception\IOException If unable to create the folder
+     * @throws \WilsonGlasser\Spout\Common\Exception\IOException If unable to create the folder
      * @return FileSystemHelper
      */
     private function createRootFolder()
@@ -120,7 +133,7 @@ class FileSystemHelper extends \Box\Spout\Common\Helper\FileSystemHelper impleme
     /**
      * Creates the "_rels" folder under the root folder as well as the ".rels" file in it
      *
-     * @throws \Box\Spout\Common\Exception\IOException If unable to create the folder or the ".rels" file
+     * @throws \WilsonGlasser\Spout\Common\Exception\IOException If unable to create the folder or the ".rels" file
      * @return FileSystemHelper
      */
     private function createRelsFolderAndFile()
@@ -135,7 +148,7 @@ class FileSystemHelper extends \Box\Spout\Common\Helper\FileSystemHelper impleme
     /**
      * Creates the ".rels" file under the "_rels" folder (under root)
      *
-     * @throws \Box\Spout\Common\Exception\IOException If unable to create the file
+     * @throws \WilsonGlasser\Spout\Common\Exception\IOException If unable to create the file
      * @return FileSystemHelper
      */
     private function createRelsFile()
@@ -157,7 +170,7 @@ EOD;
     /**
      * Creates the "docProps" folder under the root folder as well as the "app.xml" and "core.xml" files in it
      *
-     * @throws \Box\Spout\Common\Exception\IOException If unable to create the folder or one of the files
+     * @throws \WilsonGlasser\Spout\Common\Exception\IOException If unable to create the folder or one of the files
      * @return FileSystemHelper
      */
     private function createDocPropsFolderAndFiles()
@@ -173,7 +186,7 @@ EOD;
     /**
      * Creates the "app.xml" file under the "docProps" folder
      *
-     * @throws \Box\Spout\Common\Exception\IOException If unable to create the file
+     * @throws \WilsonGlasser\Spout\Common\Exception\IOException If unable to create the file
      * @return FileSystemHelper
      */
     private function createAppXmlFile()
@@ -195,7 +208,7 @@ EOD;
     /**
      * Creates the "core.xml" file under the "docProps" folder
      *
-     * @throws \Box\Spout\Common\Exception\IOException If unable to create the file
+     * @throws \WilsonGlasser\Spout\Common\Exception\IOException If unable to create the file
      * @return FileSystemHelper
      */
     private function createCoreXmlFile()
@@ -218,7 +231,7 @@ EOD;
     /**
      * Creates the "xl" folder under the root folder as well as its subfolders
      *
-     * @throws \Box\Spout\Common\Exception\IOException If unable to create at least one of the folders
+     * @throws \WilsonGlasser\Spout\Common\Exception\IOException If unable to create at least one of the folders
      * @return FileSystemHelper
      */
     private function createXlFolderAndSubFolders()
@@ -233,7 +246,7 @@ EOD;
     /**
      * Creates the "_rels" folder under the "xl" folder
      *
-     * @throws \Box\Spout\Common\Exception\IOException If unable to create the folder
+     * @throws \WilsonGlasser\Spout\Common\Exception\IOException If unable to create the folder
      * @return FileSystemHelper
      */
     private function createXlRelsFolder()
@@ -246,12 +259,13 @@ EOD;
     /**
      * Creates the "worksheets" folder under the "xl" folder
      *
-     * @throws \Box\Spout\Common\Exception\IOException If unable to create the folder
+     * @throws \WilsonGlasser\Spout\Common\Exception\IOException If unable to create the folder
      * @return FileSystemHelper
      */
     private function createXlWorksheetsFolder()
     {
         $this->xlWorksheetsFolder = $this->createFolder($this->xlFolder, self::WORKSHEETS_FOLDER_NAME);
+        $this->xlWorksheetsRelsFolder = $this->createFolder($this->xlWorksheetsFolder, self::RELS_FOLDER_NAME);
 
         return $this;
     }
@@ -325,10 +339,11 @@ EOD;
     /**
      * Creates the "workbook.xml.res" file under the "xl/_res" folder
      *
+     * @param CommentManager $commentManager
      * @param Worksheet[] $worksheets
      * @return FileSystemHelper
      */
-    public function createWorkbookRelsFile($worksheets)
+    public function createWorkbookRelsFile($commentManager, $worksheets)
     {
         $workbookRelsXmlFileContents = <<<'EOD'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -341,11 +356,49 @@ EOD;
         foreach ($worksheets as $worksheet) {
             $worksheetId = $worksheet->getId();
             $workbookRelsXmlFileContents .= '<Relationship Id="rIdSheet' . $worksheetId . '" Target="worksheets/sheet' . $worksheetId . '.xml" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"/>';
+
+
+
+            if (count($worksheet->getExternalSheet()->getComments())) {
+                // creates a xl/worksheets/_rels file
+                $sheetRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments" Target="../comments'.$worksheetId.'.xml"/></Relationships>';
+
+                $this->createFileWithContents($this->xlWorksheetsRelsFolder, 'sheet'.$worksheetId.'.xml.rels', $sheetRels);
+            }
         }
 
         $workbookRelsXmlFileContents .= '</Relationships>';
 
         $this->createFileWithContents($this->xlRelsFolder, self::WORKBOOK_RELS_XML_FILE_NAME, $workbookRelsXmlFileContents);
+
+
+
+        /**
+         * TODO - Escrever o rels do proprio sheet1 se houver comentarios!
+         */
+
+        return $this;
+    }
+
+    /**
+     * Creates the "comments{i}.xml" file under the "xl" folder
+     *
+     * @param CommentManager $commentManager
+     * @param Worksheet[] $worksheets
+     * @throws
+     * @return FileSystemHelper
+     */
+    public function createCommentsFile($commentManager, $worksheets)
+    {
+        foreach ($worksheets as $worksheet) {
+            $worksheetId = $worksheet->getId();
+
+
+            if (count($worksheet->getExternalSheet()->getComments())) {
+                $this->createFileWithContents($this->xlFolder, 'comments'.$worksheetId.'.xml', $commentManager->getCommentsXMLFileContent($worksheet));
+            }
+        }
 
         return $this;
     }

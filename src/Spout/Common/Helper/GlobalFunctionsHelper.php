@@ -1,6 +1,6 @@
 <?php
 
-namespace Box\Spout\Common\Helper;
+namespace WilsonGlasser\Spout\Common\Helper;
 
 /**
  * Class GlobalFunctionsHelper

@@ -1,16 +1,16 @@
 <?php
 
-namespace Box\Spout\Reader\CSV\Creator;
+namespace WilsonGlasser\Spout\Reader\CSV\Creator;
 
-use Box\Spout\Common\Creator\HelperFactory;
-use Box\Spout\Common\Entity\Cell;
-use Box\Spout\Common\Entity\Row;
-use Box\Spout\Common\Helper\GlobalFunctionsHelper;
-use Box\Spout\Common\Manager\OptionsManagerInterface;
-use Box\Spout\Reader\Common\Creator\InternalEntityFactoryInterface;
-use Box\Spout\Reader\CSV\RowIterator;
-use Box\Spout\Reader\CSV\Sheet;
-use Box\Spout\Reader\CSV\SheetIterator;
+use WilsonGlasser\Spout\Common\Creator\HelperFactory;
+use WilsonGlasser\Spout\Common\Entity\Cell;
+use WilsonGlasser\Spout\Common\Entity\Row;
+use WilsonGlasser\Spout\Common\Helper\GlobalFunctionsHelper;
+use WilsonGlasser\Spout\Common\Manager\OptionsManagerInterface;
+use WilsonGlasser\Spout\Reader\Common\Creator\InternalEntityFactoryInterface;
+use WilsonGlasser\Spout\Reader\CSV\RowIterator;
+use WilsonGlasser\Spout\Reader\CSV\Sheet;
+use WilsonGlasser\Spout\Reader\CSV\SheetIterator;
 
 /**
  * Class EntityFactory

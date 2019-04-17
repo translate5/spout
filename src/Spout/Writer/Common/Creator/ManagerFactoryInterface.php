@@ -1,10 +1,10 @@
 <?php
 
-namespace Box\Spout\Writer\Common\Creator;
+namespace WilsonGlasser\Spout\Writer\Common\Creator;
 
-use Box\Spout\Common\Manager\OptionsManagerInterface;
-use Box\Spout\Writer\Common\Manager\SheetManager;
-use Box\Spout\Writer\Common\Manager\WorkbookManagerInterface;
+use WilsonGlasser\Spout\Common\Manager\OptionsManagerInterface;
+use WilsonGlasser\Spout\Writer\Common\Manager\SheetManager;
+use WilsonGlasser\Spout\Writer\Common\Manager\WorkbookManagerInterface;
 
 /**
  * Interface ManagerFactoryInterface

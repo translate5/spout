@@ -1,11 +1,11 @@
 <?php
 
-namespace Box\Spout\Reader\CSV;
+namespace WilsonGlasser\Spout\Reader\CSV;
 
-use Box\Spout\Common\Exception\IOException;
-use Box\Spout\Reader\Common\Entity\Options;
-use Box\Spout\Reader\CSV\Creator\InternalEntityFactory;
-use Box\Spout\Reader\ReaderAbstract;
+use WilsonGlasser\Spout\Common\Exception\IOException;
+use WilsonGlasser\Spout\Reader\Common\Entity\Options;
+use WilsonGlasser\Spout\Reader\CSV\Creator\InternalEntityFactory;
+use WilsonGlasser\Spout\Reader\ReaderAbstract;
 
 /**
  * Class Reader
@@ -79,7 +79,7 @@ class Reader extends ReaderAbstract
      * If setEncoding() was not called, it assumes that the file is encoded in UTF-8.
      *
      * @param  string $filePath Path of the CSV file to be read
-     * @throws \Box\Spout\Common\Exception\IOException
+     * @throws \WilsonGlasser\Spout\Common\Exception\IOException
      * @return void
      */
     protected function openReader($filePath)

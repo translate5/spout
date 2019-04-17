@@ -1,11 +1,13 @@
 # Spout
 
-[![Latest Stable Version](https://poser.pugx.org/box/spout/v/stable)](https://packagist.org/packages/box/spout)
-[![Project Status](http://opensource.box.com/badges/active.svg)](http://opensource.box.com/badges)
-[![Build Status](https://travis-ci.org/box/spout.svg?branch=master)](https://travis-ci.org/box/spout)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/box/spout/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/box/spout/?branch=master)
-[![Code Coverage](https://scrutinizer-ci.com/g/box/spout/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/box/spout/?branch=master)
-[![Total Downloads](https://poser.pugx.org/box/spout/downloads)](https://packagist.org/packages/box/spout)
+[![Build Status](https://travis-ci.org/wilsonglasser/spout.svg?branch=master)](https://travis-ci.org/box/spout)
+
+
+## This version
+
+This fork is a modified version of Spout v3.0, with the ability to add merge cells, comment, formula cells, column dimensions and auto filter for XLSX Writer.
+
+## About
 
 Spout is a PHP library to read and write spreadsheet files (CSV, XLSX and ODS), in a fast and scalable way.
 Contrary to other file readers or writers, it is capable of processing very large files while keeping the memory usage really low (less than 3MB).
@@ -15,36 +17,20 @@ Join the community and come discuss about Spout: [![Gitter](https://badges.gitte
 
 ## Documentation
 
-Full documentation can be found at [http://opensource.box.com/spout/](http://opensource.box.com/spout/).
+Sorry but I won't create a documentation for the new methods at the moment.
+
+Spout Full documentation can be found at [http://opensource.box.com/spout/](http://opensource.box.com/spout/).
 
 
 ## Requirements
 
-* PHP version 7.1 or higher
+* PHP version 5.6 or higher
 * PHP extension `php_zip` enabled
 * PHP extension `php_xmlreader` enabled
 
-## Upgrade guide
-
-Version 3 introduced new functionality but also some breaking changes. If you want to upgrade your Spout codebase from version 2 please consult the [Upgrade guide](UPGRADE-3.0.md). 
-
-## Running tests
-
-The `master` branch includes unit, functional and performance tests.
-If you just want to check that everything is working as expected, executing the unit and functional tests is enough.
-
-* `phpunit` - runs unit and functional tests
-* `phpunit --group perf-tests` - only runs the performance tests
-
-For information, the performance tests take about 10 minutes to run (processing 1 million rows files is not a quick thing).
-
-> Performance tests status: [![Build Status](https://travis-ci.org/box/spout.svg?branch=perf-tests)](https://travis-ci.org/box/spout)
-
-
 ## Support
 
-You can ask questions, submit new features ideas or discuss about Spout in the chat room:<br>
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/box/spout?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+I will not offer full support for this fork, this is just a fork for a specific project.
 
 ## Copyright and License
 

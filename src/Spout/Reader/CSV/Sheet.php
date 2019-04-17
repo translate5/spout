@@ -1,15 +1,15 @@
 <?php
 
-namespace Box\Spout\Reader\CSV;
+namespace WilsonGlasser\Spout\Reader\CSV;
 
-use Box\Spout\Reader\SheetInterface;
+use WilsonGlasser\Spout\Reader\SheetInterface;
 
 /**
  * Class Sheet
  */
 class Sheet implements SheetInterface
 {
-    /** @var \Box\Spout\Reader\CSV\RowIterator To iterate over the CSV's rows */
+    /** @var \WilsonGlasser\Spout\Reader\CSV\RowIterator To iterate over the CSV's rows */
     protected $rowIterator;
 
     /**
@@ -21,7 +21,7 @@ class Sheet implements SheetInterface
     }
 
     /**
-     * @return \Box\Spout\Reader\CSV\RowIterator
+     * @return \WilsonGlasser\Spout\Reader\CSV\RowIterator
      */
     public function getRowIterator()
     {

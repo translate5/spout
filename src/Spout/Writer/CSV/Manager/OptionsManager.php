@@ -1,9 +1,9 @@
 <?php
 
-namespace Box\Spout\Writer\CSV\Manager;
+namespace WilsonGlasser\Spout\Writer\CSV\Manager;
 
-use Box\Spout\Common\Manager\OptionsManagerAbstract;
-use Box\Spout\Writer\Common\Entity\Options;
+use WilsonGlasser\Spout\Common\Manager\OptionsManagerAbstract;
+use WilsonGlasser\Spout\Writer\Common\Entity\Options;
 
 /**
  * Class OptionsManager

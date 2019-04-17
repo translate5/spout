@@ -1,9 +1,9 @@
 <?php
 
-namespace Box\Spout\Writer\XLSX;
+namespace WilsonGlasser\Spout\Writer\XLSX;
 
-use Box\Spout\Writer\Common\Entity\Options;
-use Box\Spout\Writer\WriterMultiSheetsAbstract;
+use WilsonGlasser\Spout\Writer\Common\Entity\Options;
+use WilsonGlasser\Spout\Writer\WriterMultiSheetsAbstract;
 
 /**
  * Class Writer
@@ -19,7 +19,7 @@ class Writer extends WriterMultiSheetsAbstract
      * This must be set before opening the writer.
      *
      * @param string $tempFolder Temporary folder where the files to create the XLSX will be stored
-     * @throws \Box\Spout\Writer\Exception\WriterAlreadyOpenedException If the writer was already opened
+     * @throws \WilsonGlasser\Spout\Writer\Exception\WriterAlreadyOpenedException If the writer was already opened
      * @return Writer
      */
     public function setTempFolder($tempFolder)
@@ -36,7 +36,7 @@ class Writer extends WriterMultiSheetsAbstract
      * This must be set before opening the writer.
      *
      * @param bool $shouldUseInlineStrings Whether inline or shared strings should be used
-     * @throws \Box\Spout\Writer\Exception\WriterAlreadyOpenedException If the writer was already opened
+     * @throws \WilsonGlasser\Spout\Writer\Exception\WriterAlreadyOpenedException If the writer was already opened
      * @return Writer
      */
     public function setShouldUseInlineStrings($shouldUseInlineStrings)

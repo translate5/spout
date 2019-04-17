@@ -1,9 +1,9 @@
 <?php
 
-namespace Box\Spout\Reader\Common\Creator;
+namespace WilsonGlasser\Spout\Reader\Common\Creator;
 
-use Box\Spout\Common\Entity\Cell;
-use Box\Spout\Common\Entity\Row;
+use WilsonGlasser\Spout\Common\Entity\Cell;
+use WilsonGlasser\Spout\Common\Entity\Row;
 
 /**
  * Interface EntityFactoryInterface

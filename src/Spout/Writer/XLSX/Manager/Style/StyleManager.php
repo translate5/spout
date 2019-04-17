@@ -1,16 +1,16 @@
 <?php
 
-namespace Box\Spout\Writer\XLSX\Manager\Style;
+namespace WilsonGlasser\Spout\Writer\XLSX\Manager\Style;
 
-use Box\Spout\Common\Entity\Style\Color;
-use Box\Spout\Common\Entity\Style\Style;
-use Box\Spout\Writer\XLSX\Helper\BorderHelper;
+use WilsonGlasser\Spout\Common\Entity\Style\Color;
+use WilsonGlasser\Spout\Common\Entity\Style\Style;
+use WilsonGlasser\Spout\Writer\XLSX\Helper\BorderHelper;
 
 /**
  * Class StyleManager
  * Manages styles to be applied to a cell
  */
-class StyleManager extends \Box\Spout\Writer\Common\Manager\Style\StyleManager
+class StyleManager extends \WilsonGlasser\Spout\Writer\Common\Manager\Style\StyleManager
 {
     /** @var StyleRegistry */
     protected $styleRegistry;
@@ -58,6 +58,41 @@ EOD;
         $content .= <<<'EOD'
 </styleSheet>
 EOD;
+
+        return $content;
+    }
+
+    /**
+     * Returns the content of the "<numFmts>" section
+     *
+     * @return string
+     */
+    protected function getNumberFormatContent() {
+
+        $registeredStyles = $this->styleRegistry->getRegisteredStyles();
+        $numberFormats = [];
+
+        foreach ($registeredStyles as $style) {
+            if ($style->getNumberFormat() !== null) {
+                $numberFormats[] = $style->getNumberFormat();
+            }
+        }
+
+        if (count($numberFormats) == 0)
+            return '';
+
+        $content = '<numFmts count="'.count($numberFormats).'">';
+
+
+        $id = 176;
+
+        foreach($numberFormats as $numberFormat) {
+            $numberFormat->setId($id);
+            $content .= '<numFmt numFmtId="'.$numberFormat->getId().'" formatCode="'.$numberFormat->getFormatCode().'" />';
+        }
+
+        $content .= '</numFmts>';
+
 
         return $content;
     }
@@ -153,7 +188,7 @@ EOD;
         $content .= '<border><left/><right/><top/><bottom/></border>';
 
         foreach ($registeredBorders as $styleId) {
-            /** @var \Box\Spout\Common\Entity\Style\Style $style */
+            /** @var \WilsonGlasser\Spout\Common\Entity\Style\Style $style */
             $style = $this->styleRegistry->getStyleFromStyleId($styleId);
             $border = $style->getBorder();
             $content .= '<border>';
@@ -163,7 +198,7 @@ EOD;
 
             foreach ($sortOrder as $partName) {
                 if ($border->hasPart($partName)) {
-                    /** @var $part \Box\Spout\Common\Entity\Style\BorderPart */
+                    /** @var $part \WilsonGlasser\Spout\Common\Entity\Style\BorderPart */
                     $part = $border->getPart($partName);
                     $content .= BorderHelper::serializeBorderPart($part);
                 }
@@ -207,7 +242,7 @@ EOD;
             $fillId = $this->getFillIdForStyleId($styleId);
             $borderId = $this->getBorderIdForStyleId($styleId);
 
-            $content .= '<xf numFmtId="0" fontId="' . $styleId . '" fillId="' . $fillId . '" borderId="' . $borderId . '" xfId="0"';
+            $content .= '<xf numFmtId="'.($style->getNumberFormat() !== null ? $style->getNumberFormat()->getId() : '0' ).'" fontId="' . $styleId . '" fillId="' . $fillId . '" borderId="' . $borderId . '" xfId="0"';
 
             if ($style->shouldApplyFont()) {
                 $content .= ' applyFont="1"';
@@ -215,10 +250,30 @@ EOD;
 
             $content .= sprintf(' applyBorder="%d"', $style->shouldApplyBorder() ? 1 : 0);
 
+
+            $alignment = [];
+
             if ($style->shouldWrapText()) {
-                $content .= ' applyAlignment="1">';
-                $content .= '<alignment wrapText="1"/>';
-                $content .= '</xf>';
+                $alignment['wrapText'] = 1;
+            }
+
+            if (!empty($style->getHorizontalAlign())) {
+                $alignment['horizontal'] = $style->getHorizontalAlign();
+            }
+
+            if (!empty($style->getVerticalAlign())) {
+                $alignment['vertical'] = $style->getVerticalAlign();
+            }
+
+            if ($style->getShrinkToFit()) {
+                $alignment['shrinkToFit'] = $style->getShrinkToFit();
+            }
+            if (count($alignment)) {
+                $content .= ' applyAlignment="1"><alignment ';
+                foreach($alignment as $k => $v) {
+                    $content .= $k.'="'.$v.'"';
+                }
+                $content .= '/></xf>';
             } else {
                 $content .= '/>';
             }

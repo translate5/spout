@@ -1,9 +1,10 @@
 <?php
 
-namespace Box\Spout\Writer\Common\Creator\Style;
+namespace WilsonGlasser\Spout\Writer\Common\Creator\Style;
 
-use Box\Spout\Common\Entity\Style\Border;
-use Box\Spout\Common\Entity\Style\Style;
+use WilsonGlasser\Spout\Common\Entity\Style\Border;
+use WilsonGlasser\Spout\Common\Entity\Style\NumberFormat;
+use WilsonGlasser\Spout\Common\Entity\Style\Style;
 
 /**
  * Class StyleBuilder
@@ -123,6 +124,19 @@ class StyleBuilder
     }
 
     /**
+     * Makes the text shrink to fit in the cell if requested
+     *
+     * @param bool $$shouldShrink Should the text be shrinked
+     * @return StyleBuilder
+     */
+    public function setShrinkToFit($shouldShrink = false)
+    {
+        $this->style->setShrinkToFit($shouldShrink);
+
+        return $this;
+    }
+
+    /**
      * Set a border
      *
      * @param Border $border
@@ -131,6 +145,19 @@ class StyleBuilder
     public function setBorder(Border $border)
     {
         $this->style->setBorder($border);
+
+        return $this;
+    }
+
+    /**
+     * Sets the number format.
+     *
+     * @param NumberFormat $numberFormat
+     * @return $this
+     */
+    public function setNumberFormat($numberFormat)
+    {
+        $this->style->setNumberFormat($numberFormat);
 
         return $this;
     }
@@ -147,6 +174,33 @@ class StyleBuilder
 
         return $this;
     }
+
+    /**
+     *  Sets the horizontal align
+     *
+     * @param string $align
+     * @return StyleBuilder
+     */
+    public function setHorizontalAlign($align)
+    {
+        $this->style->setHorizontalAlign($align);
+
+        return $this;
+    }
+
+    /**
+     *  Sets the vertical align
+     *
+     * @param string $align
+     * @return StyleBuilder
+     */
+    public function setVerticalAlign($align)
+    {
+        $this->style->setVerticalAlign($align);
+
+        return $this;
+    }
+
 
     /**
      * Returns the configured style. The style is cached and can be reused.

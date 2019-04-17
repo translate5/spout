@@ -1,8 +1,11 @@
 <?php
 
-namespace Box\Spout\Writer\Common\Entity;
+namespace WilsonGlasser\Spout\Writer\Common\Entity;
 
-use Box\Spout\Writer\Common\Manager\SheetManager;
+use WilsonGlasser\Spout\Common\Entity\ColumnDimension;
+use WilsonGlasser\Spout\Common\Entity\Style\Style;
+use WilsonGlasser\Spout\Writer\Exception\InvalidSheetNameException ;
+use WilsonGlasser\Spout\Writer\Common\Manager\SheetManager;
 
 /**
  * Class Sheet
@@ -27,10 +30,23 @@ class Sheet
     /** @var SheetManager Sheet manager */
     private $sheetManager;
 
+    /** @var string Range for auto Filter */
+    private $autoFilter;
+
+    /** @var ColumnDimension[] Columns widths */
+    private $columnsDimensions = [];
+
+    /** @var array Cell merges */
+    private $mergeCells = [];
+
+    /** @var Comment[] Comments  */
+    private $comments = [];
+
     /**
      * @param int $sheetIndex Index of the sheet, based on order in the workbook (zero-based)
      * @param string $associatedWorkbookId ID of the sheet's associated workbook
      * @param SheetManager $sheetManager To manage sheets
+     * @throws
      */
     public function __construct($sheetIndex, $associatedWorkbookId, SheetManager $sheetManager)
     {
@@ -76,7 +92,7 @@ class Sheet
      *  - it should be unique
      *
      * @param string $name Name of the sheet
-     * @throws \Box\Spout\Writer\Exception\InvalidSheetNameException If the sheet's name is invalid.
+     * @throws InvalidSheetNameException If the sheet's name is invalid.
      * @return Sheet
      */
     public function setName($name)
@@ -88,6 +104,78 @@ class Sheet
         $this->sheetManager->markSheetNameAsUsed($this);
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAutoFilter()
+    {
+        return $this->autoFilter;
+    }
+
+    /**
+     * @param string $range
+     */
+    public function setAutoFilter($range) {
+        $this->autoFilter = $range;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getMergeCells()
+    {
+        return $this->mergeCells;
+    }
+
+    /**
+     * @param string $range Cells range
+     */
+    public function mergeCells($range)
+    {
+        $this->mergeCells[] = $range;
+    }
+
+
+    /**
+     * @return Comment[]
+     */
+    public function getComments()
+    {
+        return $this->comments;
+    }
+
+    /**
+     * @param Comment $comment
+     */
+    public function addComment($comment)
+    {
+        $this->comments[] = $comment;
+    }
+
+    /**
+     * @return ColumnDimension[]|null
+     */
+    public function getColumnDimensions()
+    {
+        return $this->columnsDimensions;
+    }
+
+    /**
+     * @param ColumnDimension $columnDimension
+     */
+    public function addColumnDimension(ColumnDimension $columnDimension)
+    {
+        $this->columnsDimensions[] = $columnDimension;
+    }
+
+    /**
+     * @param ColumnDimension[] $dimensions
+     */
+    public function setColumnDimensions($dimensions)
+    {
+        $this->columnsDimensions = $dimensions;
     }
 
     /**
@@ -108,4 +196,25 @@ class Sheet
 
         return $this;
     }
+
+    /**
+     * Calculate widths for auto-size columns
+     *
+     * @param int[] $columnMaxLengths
+     * @param Style $defaultStyle
+     * @return Sheet;
+     */
+    public function calculateColumnWidths($columnMaxLengths, Style $defaultStyle = null)
+    {
+
+        foreach ($this->getColumnDimensions() as $colDimension) {
+            if ($colDimension->getAutoSize() && isset($columnMaxLengths[$colDimension->getColumnIndex()])) {
+                $width = ColumnDimension::calculateColumnWidth($columnMaxLengths[$colDimension->getColumnIndex()],$defaultStyle); // tem q ver se tem style D: );
+                $colDimension->setWidth($width > 0 ? $width : ColumnDimension::DEFAULT_COLUMN_WIDTH);
+            }
+        }
+
+        return $this;
+    }
+
 }

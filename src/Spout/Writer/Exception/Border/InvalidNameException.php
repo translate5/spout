@@ -1,9 +1,9 @@
 <?php
 
-namespace Box\Spout\Writer\Exception\Border;
+namespace WilsonGlasser\Spout\Writer\Exception\Border;
 
-use Box\Spout\Common\Entity\Style\BorderPart;
-use Box\Spout\Writer\Exception\WriterException;
+use WilsonGlasser\Spout\Common\Entity\Style\BorderPart;
+use WilsonGlasser\Spout\Writer\Exception\WriterException;
 
 class InvalidNameException extends WriterException
 {

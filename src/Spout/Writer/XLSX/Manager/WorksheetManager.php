@@ -1,23 +1,24 @@
 <?php
 
-namespace Box\Spout\Writer\XLSX\Manager;
+namespace WilsonGlasser\Spout\Writer\XLSX\Manager;
 
-use Box\Spout\Common\Entity\Cell;
-use Box\Spout\Common\Entity\Row;
-use Box\Spout\Common\Entity\Style\Style;
-use Box\Spout\Common\Exception\InvalidArgumentException;
-use Box\Spout\Common\Exception\IOException;
-use Box\Spout\Common\Helper\Escaper\XLSX as XLSXEscaper;
-use Box\Spout\Common\Helper\StringHelper;
-use Box\Spout\Common\Manager\OptionsManagerInterface;
-use Box\Spout\Writer\Common\Creator\InternalEntityFactory;
-use Box\Spout\Writer\Common\Entity\Options;
-use Box\Spout\Writer\Common\Entity\Worksheet;
-use Box\Spout\Writer\Common\Helper\CellHelper;
-use Box\Spout\Writer\Common\Manager\RowManager;
-use Box\Spout\Writer\Common\Manager\Style\StyleMerger;
-use Box\Spout\Writer\Common\Manager\WorksheetManagerInterface;
-use Box\Spout\Writer\XLSX\Manager\Style\StyleManager;
+use WilsonGlasser\Spout\Common\Entity\Cell;
+use WilsonGlasser\Spout\Common\Entity\Row;
+use WilsonGlasser\Spout\Common\Entity\Style\Style;
+use WilsonGlasser\Spout\Common\Exception\InvalidArgumentException;
+use WilsonGlasser\Spout\Common\Exception\IOException;
+use WilsonGlasser\Spout\Common\Helper\Escaper\XLSX as XLSXEscaper;
+use WilsonGlasser\Spout\Common\Helper\StringHelper;
+use WilsonGlasser\Spout\Common\Manager\OptionsManagerInterface;
+use WilsonGlasser\Spout\Writer\Common\Creator\InternalEntityFactory;
+use WilsonGlasser\Spout\Writer\Common\Entity\Options;
+use WilsonGlasser\Spout\Writer\Common\Entity\Worksheet;
+use WilsonGlasser\Spout\Writer\Common\Helper\CellHelper;
+use WilsonGlasser\Spout\Writer\Common\Manager\RowManager;
+use WilsonGlasser\Spout\Writer\Common\Manager\Style\StyleMerger;
+use WilsonGlasser\Spout\Writer\Common\Manager\WorksheetManagerInterface;
+use WilsonGlasser\Spout\Writer\XLSX\Manager\Style\StyleManager;
+
 
 /**
  * Class WorksheetManager
@@ -56,11 +57,13 @@ EOD;
     /** @var XLSXEscaper Strings escaper */
     private $stringsEscaper;
 
-    /** @var StringHelper String helper */
-    private $stringHelper;
-
     /** @var InternalEntityFactory Factory to create entities */
     private $entityFactory;
+
+    /**
+     * @var int[] Max length by column, used for auto size
+     */
+    private $columnsMaxTextLength = [];
 
     /**
      * WorksheetManager constructor.
@@ -71,7 +74,6 @@ EOD;
      * @param StyleMerger $styleMerger
      * @param SharedStringsManager $sharedStringsManager
      * @param XLSXEscaper $stringsEscaper
-     * @param StringHelper $stringHelper
      * @param InternalEntityFactory $entityFactory
      */
     public function __construct(
@@ -81,16 +83,15 @@ EOD;
         StyleMerger $styleMerger,
         SharedStringsManager $sharedStringsManager,
         XLSXEscaper $stringsEscaper,
-        StringHelper $stringHelper,
         InternalEntityFactory $entityFactory
-    ) {
+    )
+    {
         $this->shouldUseInlineStrings = $optionsManager->getOption(Options::SHOULD_USE_INLINE_STRINGS);
         $this->rowManager = $rowManager;
         $this->styleManager = $styleManager;
         $this->styleMerger = $styleMerger;
         $this->sharedStringsManager = $sharedStringsManager;
         $this->stringsEscaper = $stringsEscaper;
-        $this->stringHelper = $stringHelper;
         $this->entityFactory = $entityFactory;
     }
 
@@ -113,6 +114,8 @@ EOD;
         $worksheet->setFilePointer($sheetFilePointer);
 
         fwrite($sheetFilePointer, self::SHEET_XML_FILE_HEADER);
+
+
         fwrite($sheetFilePointer, '<sheetData>');
     }
 
@@ -120,8 +123,8 @@ EOD;
      * Checks if the sheet has been sucessfully created. Throws an exception if not.
      *
      * @param bool|resource $sheetFilePointer Pointer to the sheet data file or FALSE if unable to open the file
-     * @throws IOException If the sheet data file cannot be opened for writing
      * @return void
+     * @throws IOException If the sheet data file cannot be opened for writing
      */
     private function throwIfSheetFilePointerIsNotAvailable($sheetFilePointer)
     {
@@ -133,9 +136,13 @@ EOD;
     /**
      * {@inheritdoc}
      */
-    public function addRow(Worksheet $worksheet, Row $row)
+    public function addRow(Worksheet $worksheet, $row)
     {
-        if (!$this->rowManager->isEmpty($row)) {
+        if (is_array($row)) {
+            if (isset($row[0]) && count($row[0]) > 0) {
+                $this->addNonEmptyRow($worksheet, $row);
+            }
+        } else if (!$this->rowManager->isEmpty($row)) {
             $this->addNonEmptyRow($worksheet, $row);
         }
 
@@ -146,21 +153,29 @@ EOD;
      * Adds non empty row to the worksheet.
      *
      * @param Worksheet $worksheet The worksheet to add the row to
-     * @param Row $row The row to be written
-     * @throws IOException If the data cannot be written
-     * @throws InvalidArgumentException If a cell value's type is not supported
+     * @param Row|array $row The row to be written
      * @return void
+     * @throws InvalidArgumentException If a cell value's type is not supported
+     * @throws IOException If the data cannot be written
      */
-    private function addNonEmptyRow(Worksheet $worksheet, Row $row)
+    private function addNonEmptyRow(Worksheet $worksheet, $row)
     {
         $cellIndex = 0;
-        $rowStyle = $row->getStyle();
+
+        if (is_array($row)) {
+            $rowStyle = isset($row[1]) ? $row[1] : Style::defaultStyle();
+            $numCells = count($row[0]);
+            $cells = $row[0];
+        } else {
+            $rowStyle = $row->getStyle();
+            $numCells = $row->getNumCells();
+            $cells = $row->getCells();
+        }
         $rowIndex = $worksheet->getLastWrittenRowIndex() + 1;
-        $numCells = $row->getNumCells();
 
         $rowXML = '<row r="' . $rowIndex . '" spans="1:' . $numCells . '">';
 
-        foreach ($row->getCells() as $cell) {
+        foreach ($cells as $cell) {
             $rowXML .= $this->applyStyleAndGetCellXML($cell, $rowStyle, $rowIndex, $cellIndex);
             $cellIndex++;
         }
@@ -177,18 +192,29 @@ EOD;
      * Applies styles to the given style, merging the cell's style with its row's style
      * Then builds and returns xml for the cell.
      *
-     * @param Cell $cell
+     * @param Cell|array $cell
      * @param Style $rowStyle
      * @param int $rowIndex
      * @param int $cellIndex
-     * @throws InvalidArgumentException If the given value cannot be processed
      * @return string
+     * @throws InvalidArgumentException If the given value cannot be processed
      */
-    private function applyStyleAndGetCellXML(Cell $cell, Style $rowStyle, $rowIndex, $cellIndex)
+    private function applyStyleAndGetCellXML($cell, Style $rowStyle, $rowIndex, $cellIndex)
     {
+        $isObject = $cell instanceof Cell;
         // Apply row and extra styles
-        $mergedCellAndRowStyle = $this->styleMerger->merge($cell->getStyle(), $rowStyle);
-        $cell->setStyle($mergedCellAndRowStyle);
+        if ($isObject) {
+            $cellStyle = $cell->getStyle();
+        } else {
+            $cellStyle = isset($cell[2]) ? $cell[2] : null;
+        }
+        $mergedCellAndRowStyle = $this->styleMerger->merge($cellStyle, $rowStyle);
+
+        if ($isObject) {
+            $cell->setStyle($mergedCellAndRowStyle);
+        } else {
+            $cell[2] = $mergedCellAndRowStyle;
+        }
         $newCellStyle = $this->styleManager->applyExtraStylesIfNeeded($cell);
 
         $registeredStyle = $this->styleManager->registerStyle($newCellStyle);
@@ -197,28 +223,78 @@ EOD;
     }
 
     /**
+     * @return int[]
+     *
+     */
+    public function getColumnsMaxTextLength()
+    {
+        return $this->columnsMaxTextLength;
+    }
+
+    /**
+     * Increment max length for column
+     * @param string $columnIndex
+     * @param string $text
+     * @return string
+     */
+    protected function setColumnMaxCharacters($columnIndex, $text)
+    {
+
+        if (strpos($text, "\n") !== false) {
+            $lineTexts = explode("\n", $text);
+            $lineWidths = array();
+            foreach ($lineTexts as $lineText) {
+                $lineWidths[] = StringHelper::getStringLength($lineText);
+            }
+            $length = max($lineWidths); // width of longest line in cell
+        } else {
+            $length = StringHelper::getStringLength($text);
+        }
+
+        if (!isset($this->columnsMaxTextLength[$columnIndex]))
+            $this->columnsMaxTextLength[$columnIndex] = $length;
+        else
+            $this->columnsMaxTextLength[$columnIndex] = max($this->columnsMaxTextLength[$columnIndex], $length);
+        return $text;
+    }
+
+    /**
      * Builds and returns xml for a single cell.
      *
      * @param int $rowIndex
      * @param int $cellNumber
-     * @param Cell $cell
+     * @param Cell|array $cell
      * @param int $styleId
-     * @throws InvalidArgumentException If the given value cannot be processed
      * @return string
+     * @throws InvalidArgumentException If the given value cannot be processed
      */
-    private function getCellXML($rowIndex, $cellNumber, Cell $cell, $styleId)
+    private function getCellXML($rowIndex, $cellNumber, $cell, $styleId)
     {
         $columnIndex = CellHelper::getCellIndexFromColumnIndex($cellNumber);
         $cellXML = '<c r="' . $columnIndex . $rowIndex . '"';
         $cellXML .= ' s="' . $styleId . '"';
 
-        if ($cell->isString()) {
-            $cellXML .= $this->getCellXMLFragmentForNonEmptyString($cell->getValue());
-        } elseif ($cell->isBoolean()) {
-            $cellXML .= ' t="b"><v>' . (int) ($cell->getValue()) . '</v></c>';
-        } elseif ($cell->isNumeric()) {
-            $cellXML .= '><v>' . $cell->getValue() . '</v></c>';
-        } elseif ($cell->isEmpty()) {
+        if ($cell instanceof Cell) {
+            $type = $cell->getType();
+            if ($cell->isFormula()) {
+                $value = [$cell->getValue(), $cell->getFormula()];
+            } else {
+                $value = $cell->getValue();
+            }
+        } else {
+            $type = $cell[0];
+            $value = $cell[1];
+        }
+
+        if ($type === Cell::TYPE_STRING) {
+            $cellXML .= $this->getCellXMLFragmentForNonEmptyString($this->setColumnMaxCharacters($columnIndex, $value));
+        } elseif ($type === Cell::TYPE_FORMULA) {
+            $cellXML .= '><f>' . $value[1]. '</f><v>' . $this->setColumnMaxCharacters($columnIndex, $value[0]) . '</v></c>';
+        } elseif ($type === Cell::TYPE_BOOLEAN) {
+            $cellXML .= ' t="b"><v>' . $this->setColumnMaxCharacters($columnIndex, (int)($value)) . '</v></c>';
+        } elseif ($type === Cell::TYPE_NUMERIC) {
+            $cellXML .= '><v>' . $this->setColumnMaxCharacters($columnIndex, $value) . '</v></c>';
+        } elseif ($type === Cell::TYPE_EMPTY) {
             if ($this->styleManager->shouldApplyStyleOnEmptyCell($styleId)) {
                 $cellXML .= '/>';
             } else {
@@ -227,7 +303,7 @@ EOD;
                 $cellXML = '';
             }
         } else {
-            throw new InvalidArgumentException('Trying to add a value with an unsupported type: ' . gettype($cell->getValue()));
+            throw new InvalidArgumentException('Trying to add a value with an unsupported type: ' . gettype($value));
         }
 
         return $cellXML;
@@ -237,12 +313,12 @@ EOD;
      * Returns the XML fragment for a cell containing a non empty string
      *
      * @param string $cellValue The cell value
-     * @throws InvalidArgumentException If the string exceeds the maximum number of characters allowed per cell
      * @return string The XML fragment representing the cell
+     * @throws InvalidArgumentException If the string exceeds the maximum number of characters allowed per cell
      */
     private function getCellXMLFragmentForNonEmptyString($cellValue)
     {
-        if ($this->stringHelper->getStringLength($cellValue) > self::MAX_CHARACTERS_PER_CELL) {
+        if (StringHelper::getStringLength($cellValue) > self::MAX_CHARACTERS_PER_CELL) {
             throw new InvalidArgumentException('Trying to add a value that exceeds the maximum number of characters allowed in a cell (32,767)');
         }
 
@@ -259,7 +335,7 @@ EOD;
     /**
      * {@inheritdoc}
      */
-    public function close(Worksheet $worksheet)
+    public function close(Worksheet $worksheet, Style $defaultStyle = null)
     {
         $worksheetFilePointer = $worksheet->getFilePointer();
 
@@ -268,6 +344,71 @@ EOD;
         }
 
         fwrite($worksheetFilePointer, '</sheetData>');
+
+
+        $sheet = $worksheet->getExternalSheet();
+
+
+        if (count($sheet->getColumnDimensions())) {
+
+            fwrite($worksheetFilePointer, '<cols>');
+            /**
+             * Autosize columns
+             */
+
+            $sheet->calculateColumnWidths($this->getColumnsMaxTextLength(), $defaultStyle);
+
+            foreach ($sheet->getColumnDimensions() as $columnDimension) {
+                $cellIndex = CellHelper::getColumnToIndexFromCellIndex($columnDimension->getColumnIndex()) + 1;
+                $attributes = [
+                    'min' => $cellIndex,
+                    'max' => $cellIndex,
+                    'width' => $columnDimension->getWidth() + ($sheet->getAutoFilter() !== null ? 2 : 0),
+                    'customWidth' => 'true'
+                ];
+
+                // Column visibility
+                if ($columnDimension->getVisible() == false) {
+                    $attributes['hidden'] = 'true';
+                }
+
+                // Auto size?
+                if ($columnDimension->getAutoSize()) {
+                    $attributes['bestFit'] = 'true';
+                }
+
+                // Collapsed
+                if ($columnDimension->getCollapsed() == true) {
+                    $attributes['collapsed'] = 'true';
+                }
+
+                // Outline level
+                if ($columnDimension->getOutlineLevel() > 0) {
+                    $attributes['outlineLevel'] = $columnDimension->getOutlineLevel();
+                }
+
+                $xml = '';
+                foreach($attributes as $k => $v) {
+                    $xml .= $k.'="'.$v.'" ';
+                }
+
+                fwrite($worksheetFilePointer, '<col '.$xml.' />');
+
+            }
+
+            fwrite($worksheetFilePointer, '</cols>');
+        }
+
+        if ($sheet->getAutoFilter() !== null) {
+            fwrite($worksheetFilePointer, ' <autoFilter ref="' . $sheet->getAutoFilter() . '"><extLst /></autoFilter>');
+        }
+        if (count($sheet->getMergeCells()) > 0) {
+            fwrite($worksheetFilePointer, '<mergeCells>');
+            foreach ($sheet->getMergeCells() as $mergeCell) {
+                fwrite($worksheetFilePointer, ' <mergeCell ref="' . $mergeCell . '"/>');
+            }
+            fwrite($worksheetFilePointer, '</mergeCells>');
+        }
         fwrite($worksheetFilePointer, '</worksheet>');
         fclose($worksheetFilePointer);
     }

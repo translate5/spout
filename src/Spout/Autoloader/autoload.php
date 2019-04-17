@@ -1,6 +1,6 @@
 <?php
 
-namespace Box\Spout\Autoloader;
+namespace WilsonGlasser\Spout\Autoloader;
 
 require_once 'Psr4Autoloader.php';
 

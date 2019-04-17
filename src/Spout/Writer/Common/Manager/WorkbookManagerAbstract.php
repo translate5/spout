@@ -1,21 +1,23 @@
 <?php
 
-namespace Box\Spout\Writer\Common\Manager;
+namespace WilsonGlasser\Spout\Writer\Common\Manager;
 
-use Box\Spout\Common\Entity\Row;
-use Box\Spout\Common\Exception\IOException;
-use Box\Spout\Common\Manager\OptionsManagerInterface;
-use Box\Spout\Writer\Common\Creator\InternalEntityFactory;
-use Box\Spout\Writer\Common\Creator\ManagerFactoryInterface;
-use Box\Spout\Writer\Common\Entity\Options;
-use Box\Spout\Writer\Common\Entity\Sheet;
-use Box\Spout\Writer\Common\Entity\Workbook;
-use Box\Spout\Writer\Common\Entity\Worksheet;
-use Box\Spout\Writer\Common\Helper\FileSystemWithRootFolderHelperInterface;
-use Box\Spout\Writer\Common\Manager\Style\StyleManagerInterface;
-use Box\Spout\Writer\Common\Manager\Style\StyleMerger;
-use Box\Spout\Writer\Exception\SheetNotFoundException;
-use Box\Spout\Writer\Exception\WriterException;
+use WilsonGlasser\Spout\Common\Entity\Row;
+use WilsonGlasser\Spout\Common\Entity\Style\Style;
+use WilsonGlasser\Spout\Common\Exception\IOException;
+use WilsonGlasser\Spout\Common\Manager\OptionsManagerInterface;
+use WilsonGlasser\Spout\Writer\Common\Creator\InternalEntityFactory;
+use WilsonGlasser\Spout\Writer\Common\Creator\ManagerFactoryInterface;
+use WilsonGlasser\Spout\Writer\Common\Entity\Options;
+use WilsonGlasser\Spout\Writer\Common\Entity\Sheet;
+use WilsonGlasser\Spout\Writer\Common\Entity\Workbook;
+use WilsonGlasser\Spout\Writer\Common\Entity\Worksheet;
+use WilsonGlasser\Spout\Writer\Common\Helper\FileSystemWithRootFolderHelperInterface;
+use WilsonGlasser\Spout\Writer\Common\Manager\Style\StyleManagerInterface;
+use WilsonGlasser\Spout\Writer\Common\Manager\Style\StyleMerger;
+use WilsonGlasser\Spout\Writer\Exception\SheetNotFoundException;
+use WilsonGlasser\Spout\Writer\Exception\WriterException;
+use WilsonGlasser\Spout\Writer\XLSX\Manager\Comment\CommentManager;
 
 /**
  * Class WorkbookManagerAbstract
@@ -31,6 +33,9 @@ abstract class WorkbookManagerAbstract implements WorkbookManagerInterface
 
     /** @var WorksheetManagerInterface */
     protected $worksheetManager;
+
+    /** @var CommentManager Manages comments */
+    protected $commentManager;
 
     /** @var StyleManagerInterface Manages styles */
     protected $styleManager;
@@ -54,6 +59,7 @@ abstract class WorkbookManagerAbstract implements WorkbookManagerInterface
      * @param Workbook $workbook
      * @param OptionsManagerInterface $optionsManager
      * @param WorksheetManagerInterface $worksheetManager
+     * @param CommentManager $commentManager
      * @param StyleManagerInterface $styleManager
      * @param StyleMerger $styleMerger
      * @param FileSystemWithRootFolderHelperInterface $fileSystemHelper
@@ -64,6 +70,7 @@ abstract class WorkbookManagerAbstract implements WorkbookManagerInterface
         Workbook $workbook,
         OptionsManagerInterface $optionsManager,
         WorksheetManagerInterface $worksheetManager,
+        CommentManager $commentManager,
         StyleManagerInterface $styleManager,
         StyleMerger $styleMerger,
         FileSystemWithRootFolderHelperInterface $fileSystemHelper,
@@ -74,6 +81,7 @@ abstract class WorkbookManagerAbstract implements WorkbookManagerInterface
         $this->optionsManager = $optionsManager;
         $this->worksheetManager = $worksheetManager;
         $this->styleManager = $styleManager;
+        $this->commentManager = $commentManager;
         $this->styleMerger = $styleMerger;
         $this->fileSystemHelper = $fileSystemHelper;
         $this->entityFactory = $entityFactory;
@@ -117,7 +125,7 @@ abstract class WorkbookManagerAbstract implements WorkbookManagerInterface
     /**
      * Creates a new sheet in the workbook. The current sheet remains unchanged.
      *
-     * @throws \Box\Spout\Common\Exception\IOException If unable to open the sheet for writing
+     * @throws \WilsonGlasser\Spout\Common\Exception\IOException If unable to open the sheet for writing
      * @return Worksheet The created sheet
      */
     private function addNewSheet()
@@ -209,12 +217,12 @@ abstract class WorkbookManagerAbstract implements WorkbookManagerInterface
      * If shouldCreateNewSheetsAutomatically option is set to true, it will handle pagination
      * with the creation of new worksheets if one worksheet has reached its maximum capicity.
      *
-     * @param Row $row The row to be added
+     * @param Row|array $row The row to be added
      * @throws IOException If trying to create a new sheet and unable to open the sheet for writing
      * @throws WriterException If unable to write data
      * @return void
      */
-    public function addRowToCurrentWorksheet(Row $row)
+    public function addRowToCurrentWorksheet($row)
     {
         $currentWorksheet = $this->getCurrentWorksheet();
         $hasReachedMaxRows = $this->hasCurrentWorksheetReachedMaxRows();
@@ -248,31 +256,38 @@ abstract class WorkbookManagerAbstract implements WorkbookManagerInterface
      * Adds a row to the given sheet.
      *
      * @param Worksheet $worksheet Worksheet to write the row to
-     * @param Row $row The row to be added
+     * @param Row|array $row The row to be added
      * @throws WriterException If unable to write data
+     * @throws \Exception
      * @return void
      */
-    private function addRowToWorksheet(Worksheet $worksheet, Row $row)
+    private function addRowToWorksheet(Worksheet $worksheet, $row)
     {
         $this->applyDefaultRowStyle($row);
         $this->worksheetManager->addRow($worksheet, $row);
 
         // update max num columns for the worksheet
         $currentMaxNumColumns = $worksheet->getMaxNumColumns();
-        $cellsCount = $row->getNumCells();
+        $cellsCount = $row instanceof Row ? $row->getNumCells() : (isset($row[0]) ? count($row[0]) : 0);
         $worksheet->setMaxNumColumns(max($currentMaxNumColumns, $cellsCount));
     }
 
     /**
-     * @param Row $row
+     * @param Row|array $row
      */
-    private function applyDefaultRowStyle(Row $row)
+    private function applyDefaultRowStyle($row)
     {
         $defaultRowStyle = $this->optionsManager->getOption(Options::DEFAULT_ROW_STYLE);
 
         if ($defaultRowStyle !== null) {
-            $mergedStyle = $this->styleMerger->merge($row->getStyle(), $defaultRowStyle);
-            $row->setStyle($mergedStyle);
+            $is_object = $row instanceof Row;
+            if ($is_object) {
+                $mergedStyle = $this->styleMerger->merge($row->getStyle(), $defaultRowStyle);
+                $row->setStyle($mergedStyle);
+            } else {
+                $mergedStyle = $this->styleMerger->merge(isset($row[1]) ? $row[1] : Style::defaultStyle(), $defaultRowStyle);
+                $row[1] = $mergedStyle;
+            }
         }
     }
 
@@ -319,8 +334,11 @@ abstract class WorkbookManagerAbstract implements WorkbookManagerInterface
     {
         $worksheets = $this->getWorksheets();
 
+
+        $defaultRowStyle = $this->optionsManager->getOption(Options::DEFAULT_ROW_STYLE);
+
         foreach ($worksheets as $worksheet) {
-            $this->worksheetManager->close($worksheet);
+            $this->worksheetManager->close($worksheet, $defaultRowStyle);
         }
     }
 

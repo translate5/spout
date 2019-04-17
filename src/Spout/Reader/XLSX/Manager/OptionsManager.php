@@ -1,9 +1,9 @@
 <?php
 
-namespace Box\Spout\Reader\XLSX\Manager;
+namespace WilsonGlasser\Spout\Reader\XLSX\Manager;
 
-use Box\Spout\Common\Manager\OptionsManagerAbstract;
-use Box\Spout\Reader\Common\Entity\Options;
+use WilsonGlasser\Spout\Common\Manager\OptionsManagerAbstract;
+use WilsonGlasser\Spout\Reader\Common\Entity\Options;
 
 /**
  * Class OptionsManager

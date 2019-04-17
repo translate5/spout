@@ -1,6 +1,6 @@
 <?php
 
-namespace Box\Spout\Common\Entity\Style;
+namespace WilsonGlasser\Spout\Common\Entity\Style;
 
 /**
  * Class Style
@@ -12,6 +12,12 @@ class Style
     const DEFAULT_FONT_SIZE = 11;
     const DEFAULT_FONT_COLOR = Color::BLACK;
     const DEFAULT_FONT_NAME = 'Arial';
+    const ALIGN_TOP = 'top';
+    const ALIGN_MIDDLE = 'center';
+    const ALIGN_DEFAULT = 'general';
+    const ALIGN_BOTTOM = 'bottom';
+    const ALIGN_LEFT = 'left';
+    const ALIGN_RIGHT = 'right';
 
     /** @var int|null Style ID */
     private $id;
@@ -59,6 +65,15 @@ class Style
     /** @var bool Whether the wrap text property was set */
     private $hasSetWrapText = false;
 
+    /** @var bool Text need to shrink to fit */
+    private $shrinkToFit = false;
+
+    /** @var string Horizontal align */
+    private $horizontalAlign = '';
+
+    /** @var string Vertical align */
+    private $verticalAlign = self::ALIGN_MIDDLE;
+
     /** @var Border */
     private $border;
 
@@ -70,6 +85,18 @@ class Style
 
     /** @var bool */
     private $hasSetBackgroundColor = false;
+
+    /** @var NumberFormat */
+    private $numberFormat;
+
+    private static $instance;
+
+    public static function defaultStyle() {
+        if (self::$instance === null) {
+            self::$instance = new Style();
+        }
+        return self::$instance;
+    }
 
     /**
      * @return int|null
@@ -356,6 +383,63 @@ class Style
     }
 
     /**
+     * @return string
+     */
+    public function getVerticalAlign()
+    {
+        return $this->verticalAlign;
+    }
+
+    /**
+     * @param string $verticalAlign Set text vertical align
+     * @return Style
+     */
+    public function setVerticalAlign($verticalAlign )
+    {
+        $this->verticalAlign = $verticalAlign;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHorizontalAlign()
+    {
+        return $this->horizontalAlign;
+    }
+
+    /**
+     * @param string $verticalAlign Set text vertical align
+     * @return Style
+     */
+    public function setHorizontalAlign($horizontalAlign )
+    {
+        $this->horizontalAlign = $horizontalAlign;
+
+        return $this;
+    }
+    /**
+     * Sets shrink to fit
+     * @param bool
+     * @return Style
+     */
+    public function setShrinkToFit($shouldShrink=false)
+    {
+        $this->shrinkToFit = $shouldShrink;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getShrinkToFit()
+    {
+        return $this->shrinkToFit;
+    }
+
+    /**
      * Sets the background color
      * @param string $color ARGB color (@see Color)
      * @return Style
@@ -382,5 +466,27 @@ class Style
     public function shouldApplyBackgroundColor()
     {
         return $this->hasSetBackgroundColor;
+    }
+
+
+    /**
+     * @return NumberFormat
+     */
+    public function getNumberFormat()
+    {
+        return $this->numberFormat;
+    }
+
+    /**
+     * Sets the number format.
+     *
+     * @param NumberFormat $numberFormat
+     * @return Style
+     */
+    public function setNumberFormat($numberFormat)
+    {
+        $this->numberFormat = $numberFormat;
+
+        return $this;
     }
 }

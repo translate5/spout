@@ -1,6 +1,6 @@
 <?php
 
-namespace Box\Spout\Writer\Common\Entity;
+namespace WilsonGlasser\Spout\Writer\Common\Entity;
 
 /**
  * Class Worksheet
@@ -22,6 +22,7 @@ class Worksheet
 
     /** @var int Index of the last written row */
     private $lastWrittenRowIndex;
+
 
     /**
      * Worksheet constructor.
@@ -77,6 +78,7 @@ class Worksheet
     {
         return $this->maxNumColumns;
     }
+
 
     /**
      * @param int $maxNumColumns

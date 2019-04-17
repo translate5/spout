@@ -1,11 +1,11 @@
 <?php
 
-namespace Box\Spout\Writer\Common\Creator;
+namespace WilsonGlasser\Spout\Writer\Common\Creator;
 
-use Box\Spout\Common\Entity\Cell;
-use Box\Spout\Common\Entity\Row;
-use Box\Spout\Common\Entity\Style\Style;
-use Box\Spout\Writer\WriterInterface;
+use WilsonGlasser\Spout\Common\Entity\Cell;
+use WilsonGlasser\Spout\Common\Entity\Row;
+use WilsonGlasser\Spout\Common\Entity\Style\Style;
+use WilsonGlasser\Spout\Writer\WriterInterface;
 
 /**
  * Class WriterEntityFactory
@@ -17,7 +17,7 @@ class WriterEntityFactory
      * This creates an instance of the appropriate writer, given the type of the file to be written
      *
      * @param  string $writerType Type of the writer to instantiate
-     * @throws \Box\Spout\Common\Exception\UnsupportedTypeException
+     * @throws \WilsonGlasser\Spout\Common\Exception\UnsupportedTypeException
      * @return WriterInterface
      */
     public static function createWriter($writerType)

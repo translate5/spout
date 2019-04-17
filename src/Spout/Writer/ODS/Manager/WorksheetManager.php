@@ -1,18 +1,17 @@
 <?php
 
-namespace Box\Spout\Writer\ODS\Manager;
+namespace WilsonGlasser\Spout\Writer\ODS\Manager;
 
-use Box\Spout\Common\Entity\Cell;
-use Box\Spout\Common\Entity\Row;
-use Box\Spout\Common\Entity\Style\Style;
-use Box\Spout\Common\Exception\InvalidArgumentException;
-use Box\Spout\Common\Exception\IOException;
-use Box\Spout\Common\Helper\Escaper\ODS as ODSEscaper;
-use Box\Spout\Common\Helper\StringHelper;
-use Box\Spout\Writer\Common\Entity\Worksheet;
-use Box\Spout\Writer\Common\Manager\Style\StyleMerger;
-use Box\Spout\Writer\Common\Manager\WorksheetManagerInterface;
-use Box\Spout\Writer\ODS\Manager\Style\StyleManager;
+use WilsonGlasser\Spout\Common\Entity\Cell;
+use WilsonGlasser\Spout\Common\Entity\Row;
+use WilsonGlasser\Spout\Common\Entity\Style\Style;
+use WilsonGlasser\Spout\Common\Exception\InvalidArgumentException;
+use WilsonGlasser\Spout\Common\Exception\IOException;
+use WilsonGlasser\Spout\Common\Helper\Escaper\ODS as ODSEscaper;
+use WilsonGlasser\Spout\Writer\Common\Entity\Worksheet;
+use WilsonGlasser\Spout\Writer\Common\Manager\Style\StyleMerger;
+use WilsonGlasser\Spout\Writer\Common\Manager\WorksheetManagerInterface;
+use WilsonGlasser\Spout\Writer\ODS\Manager\Style\StyleManager;
 
 /**
  * Class WorksheetManager
@@ -20,11 +19,8 @@ use Box\Spout\Writer\ODS\Manager\Style\StyleManager;
  */
 class WorksheetManager implements WorksheetManagerInterface
 {
-    /** @var \Box\Spout\Common\Helper\Escaper\ODS Strings escaper */
+    /** @var \WilsonGlasser\Spout\Common\Helper\Escaper\ODS Strings escaper */
     private $stringsEscaper;
-
-    /** @var StringHelper String helper */
-    private $stringHelper;
 
     /** @var StyleManager Manages styles */
     private $styleManager;
@@ -38,25 +34,22 @@ class WorksheetManager implements WorksheetManagerInterface
      * @param StyleManager $styleManager
      * @param StyleMerger $styleMerger
      * @param ODSEscaper $stringsEscaper
-     * @param StringHelper $stringHelper
      */
     public function __construct(
         StyleManager $styleManager,
         StyleMerger $styleMerger,
-        ODSEscaper $stringsEscaper,
-        StringHelper $stringHelper
+        ODSEscaper $stringsEscaper
     ) {
         $this->styleManager = $styleManager;
         $this->styleMerger = $styleMerger;
         $this->stringsEscaper = $stringsEscaper;
-        $this->stringHelper = $stringHelper;
     }
 
     /**
      * Prepares the worksheet to accept data
      *
      * @param Worksheet $worksheet The worksheet to start
-     * @throws \Box\Spout\Common\Exception\IOException If the sheet data file cannot be opened for writing
+     * @throws \WilsonGlasser\Spout\Common\Exception\IOException If the sheet data file cannot be opened for writing
      * @return void
      */
     public function startSheet(Worksheet $worksheet)
@@ -108,7 +101,7 @@ class WorksheetManager implements WorksheetManagerInterface
      * @throws InvalidArgumentException If a cell value's type is not supported
      * @return void
      */
-    public function addRow(Worksheet $worksheet, Row $row)
+    public function addRow(Worksheet $worksheet, $row)
     {
         $cells = $row->getCells();
         $rowStyle = $row->getStyle();
@@ -217,9 +210,10 @@ class WorksheetManager implements WorksheetManagerInterface
      * Closes the worksheet
      *
      * @param Worksheet $worksheet
+     * @param Style $defaultStyle
      * @return void
      */
-    public function close(Worksheet $worksheet)
+    public function close(Worksheet $worksheet, Style $defaultStyle = null)
     {
         $worksheetFilePointer = $worksheet->getFilePointer();
 

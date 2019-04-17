@@ -1,9 +1,9 @@
 <?php
 
-namespace Box\Spout\Common\Entity;
+namespace WilsonGlasser\Spout\Common\Entity;
 
-use Box\Spout\Common\Entity\Style\Style;
-use Box\Spout\Common\Helper\CellTypeHelper;
+use WilsonGlasser\Spout\Common\Entity\Style\Style;
+use WilsonGlasser\Spout\Common\Helper\CellTypeHelper;
 
 /**
  * Class Cell
@@ -47,6 +47,11 @@ class Cell
     const TYPE_ERROR = 6;
 
     /**
+     * The formula of this cell
+     * @var string
+     */
+    protected $formula;
+    /**
      * The value of this cell
      * @var mixed|null
      */
@@ -79,8 +84,23 @@ class Cell
      */
     public function setValue($value)
     {
+        $this->type = self::detectType($value);
+
+        if ($this->isFormula()) {
+            $this->formula = ltrim($value,'=');
+            $this->value = '';
+        } else {
+            $this->value = $value;
+        }
+    }
+
+
+    /**
+     * @param mixed|null $value
+     */
+    public function setCalculatedValue($value)
+    {
         $this->value = $value;
-        $this->type = $this->detectType($value);
     }
 
     /**
@@ -89,6 +109,14 @@ class Cell
     public function getValue()
     {
         return !$this->isError() ? $this->value : null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFormula()
+    {
+        return !$this->isError() ? $this->formula : null;
     }
 
     /**
@@ -129,10 +157,13 @@ class Cell
      * @param mixed|null $value
      * @return int
      */
-    protected function detectType($value)
+    static function detectType($value)
     {
         if (CellTypeHelper::isBoolean($value)) {
             return self::TYPE_BOOLEAN;
+        }
+        if (is_string($value) && substr($value,0,1) === '=') {
+            return self::TYPE_FORMULA;
         }
         if (CellTypeHelper::isEmpty($value)) {
             return self::TYPE_EMPTY;
@@ -156,6 +187,15 @@ class Cell
     public function isBoolean()
     {
         return $this->type === self::TYPE_BOOLEAN;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isFormula()
+    {
+        return $this->type === self::TYPE_FORMULA;
     }
 
     /**

@@ -1,11 +1,12 @@
 <?php
 
-namespace Box\Spout\Writer\XLSX\Manager;
+namespace WilsonGlasser\Spout\Writer\XLSX\Manager;
 
-use Box\Spout\Writer\Common\Entity\Sheet;
-use Box\Spout\Writer\Common\Manager\WorkbookManagerAbstract;
-use Box\Spout\Writer\XLSX\Helper\FileSystemHelper;
-use Box\Spout\Writer\XLSX\Manager\Style\StyleManager;
+use WilsonGlasser\Spout\Writer\Common\Entity\Sheet;
+use WilsonGlasser\Spout\Writer\Common\Manager\WorkbookManagerAbstract;
+use WilsonGlasser\Spout\Writer\XLSX\Helper\FileSystemHelper;
+use WilsonGlasser\Spout\Writer\XLSX\Manager\Comment\CommentManager;
+use WilsonGlasser\Spout\Writer\XLSX\Manager\Style\StyleManager;
 
 /**
  * Class WorkbookManager
@@ -46,6 +47,13 @@ class WorkbookManager extends WorkbookManagerAbstract
 
         return $worksheetFilesFolder . '/' . strtolower($sheet->getName()) . '.xml';
     }
+    /**
+     * @return CommentManager
+     */
+    public function getCommentManager()
+    {
+        return $this->commentManager;
+    }
 
     /**
      * Closes custom objects that are still opened
@@ -70,7 +78,8 @@ class WorkbookManager extends WorkbookManagerAbstract
         $this->fileSystemHelper
             ->createContentTypesFile($worksheets)
             ->createWorkbookFile($worksheets)
-            ->createWorkbookRelsFile($worksheets)
+            ->createCommentsFile($this->getCommentManager(), $worksheets)
+            ->createWorkbookRelsFile($this->getCommentManager(),$worksheets)
             ->createStylesFile($this->styleManager)
             ->zipRootFolderAndCopyToStream($finalFilePointer);
     }

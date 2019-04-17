@@ -1,19 +1,19 @@
 <?php
 
-namespace Box\Spout\Writer;
+namespace WilsonGlasser\Spout\Writer;
 
-use Box\Spout\Common\Creator\HelperFactory;
-use Box\Spout\Common\Entity\Row;
-use Box\Spout\Common\Helper\GlobalFunctionsHelper;
-use Box\Spout\Common\Manager\OptionsManagerInterface;
-use Box\Spout\Writer\Common\Creator\ManagerFactoryInterface;
-use Box\Spout\Writer\Common\Entity\Options;
-use Box\Spout\Writer\Common\Entity\Sheet;
-use Box\Spout\Writer\Common\Entity\Worksheet;
-use Box\Spout\Writer\Common\Manager\WorkbookManagerInterface;
-use Box\Spout\Writer\Exception\SheetNotFoundException;
-use Box\Spout\Writer\Exception\WriterAlreadyOpenedException;
-use Box\Spout\Writer\Exception\WriterNotOpenedException;
+use WilsonGlasser\Spout\Common\Creator\HelperFactory;
+use WilsonGlasser\Spout\Common\Entity\Row;
+use WilsonGlasser\Spout\Common\Helper\GlobalFunctionsHelper;
+use WilsonGlasser\Spout\Common\Manager\OptionsManagerInterface;
+use WilsonGlasser\Spout\Writer\Common\Creator\ManagerFactoryInterface;
+use WilsonGlasser\Spout\Writer\Common\Entity\Options;
+use WilsonGlasser\Spout\Writer\Common\Entity\Sheet;
+use WilsonGlasser\Spout\Writer\Common\Entity\Worksheet;
+use WilsonGlasser\Spout\Writer\Common\Manager\WorkbookManagerInterface;
+use WilsonGlasser\Spout\Writer\Exception\SheetNotFoundException;
+use WilsonGlasser\Spout\Writer\Exception\WriterAlreadyOpenedException;
+use WilsonGlasser\Spout\Writer\Exception\WriterNotOpenedException;
 
 /**
  * Class WriterMultiSheetsAbstract
@@ -27,6 +27,7 @@ abstract class WriterMultiSheetsAbstract extends WriterAbstract
 
     /** @var WorkbookManagerInterface */
     private $workbookManager;
+
 
     /**
      * @param OptionsManagerInterface $optionsManager
@@ -121,6 +122,19 @@ abstract class WriterMultiSheetsAbstract extends WriterAbstract
     }
 
     /**
+     * Returns the current sheet
+     *
+     * @throws WriterNotOpenedException If the writer has not been opened yet
+     * @return Worksheet The current sheet
+     */
+    public function getCurrentWorksheet()
+    {
+        $this->throwIfWorkbookIsNotAvailable();
+
+        return $this->workbookManager->getCurrentWorksheet();
+    }
+
+    /**
      * Sets the given sheet as the current one. New data will be written to this sheet.
      * The writing will resume where it stopped (i.e. data won't be truncated).
      *
@@ -151,7 +165,7 @@ abstract class WriterMultiSheetsAbstract extends WriterAbstract
     /**
      * {@inheritdoc}
      */
-    protected function addRowToWriter(Row $row)
+    protected function addRowToWriter($row)
     {
         $this->throwIfWorkbookIsNotAvailable();
         $this->workbookManager->addRowToCurrentWorksheet($row);
