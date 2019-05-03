@@ -60,6 +60,8 @@ EOD;
     /** @var InternalEntityFactory Factory to create entities */
     private $entityFactory;
 
+    private $beforeSheetDataPointer;
+
     /**
      * @var int[] Max length by column, used for auto size
      */
@@ -108,15 +110,16 @@ EOD;
      */
     public function startSheet(Worksheet $worksheet)
     {
-        $sheetFilePointer = fopen($worksheet->getFilePath(), 'w');
+        $sheetFilePointer = fopen($worksheet->getFilePath(), 'w+');
         $this->throwIfSheetFilePointerIsNotAvailable($sheetFilePointer);
 
         $worksheet->setFilePointer($sheetFilePointer);
 
-        fwrite($sheetFilePointer, self::SHEET_XML_FILE_HEADER);
+        fwrite($sheetFilePointer, self::SHEET_XML_FILE_HEADER.PHP_EOL);
 
+        $this->beforeSheetDataPointer = ftell($sheetFilePointer);
 
-        fwrite($sheetFilePointer, '<sheetData>');
+        fwrite($sheetFilePointer, '<sheetData>'.PHP_EOL);
     }
 
     /**
@@ -173,14 +176,14 @@ EOD;
         }
         $rowIndex = $worksheet->getLastWrittenRowIndex() + 1;
 
-        $rowXML = '<row r="' . $rowIndex . '" spans="1:' . $numCells . '">';
+        $rowXML = '<row r="' . $rowIndex . '" spans="1:' . $numCells . '">'.PHP_EOL;
 
         foreach ($cells as $cell) {
-            $rowXML .= $this->applyStyleAndGetCellXML($cell, $rowStyle, $rowIndex, $cellIndex);
+            $rowXML .= "\t".$this->applyStyleAndGetCellXML($cell, $rowStyle, $rowIndex, $cellIndex);
             $cellIndex++;
         }
 
-        $rowXML .= '</row>';
+        $rowXML .= '</row>'.PHP_EOL;
 
         $wasWriteSuccessful = fwrite($worksheet->getFilePointer(), $rowXML);
         if ($wasWriteSuccessful === false) {
@@ -306,7 +309,7 @@ EOD;
             throw new InvalidArgumentException('Trying to add a value with an unsupported type: ' . gettype($value));
         }
 
-        return $cellXML;
+        return $cellXML.PHP_EOL;
     }
 
     /**
@@ -343,7 +346,7 @@ EOD;
             return;
         }
 
-        fwrite($worksheetFilePointer, '</sheetData>');
+        fwrite($worksheetFilePointer, '</sheetData>'.PHP_EOL);
 
 
         $sheet = $worksheet->getExternalSheet();
@@ -351,7 +354,12 @@ EOD;
 
         if (count($sheet->getColumnDimensions())) {
 
-            fwrite($worksheetFilePointer, '<cols>');
+            // I didn't found a way to append a file in the middle without storing all content =/
+            $afterContent =  stream_get_contents($worksheetFilePointer, -1, $this->beforeSheetDataPointer);
+
+            fseek($worksheetFilePointer, $this->beforeSheetDataPointer);
+
+            fwrite($worksheetFilePointer, '<cols>'.PHP_EOL);
             /**
              * Autosize columns
              */
@@ -392,24 +400,30 @@ EOD;
                     $xml .= $k.'="'.$v.'" ';
                 }
 
-                fwrite($worksheetFilePointer, '<col '.$xml.' />');
+                fwrite($worksheetFilePointer, "\t".'<col '.$xml.' />'.PHP_EOL);
+
+
 
             }
 
-            fwrite($worksheetFilePointer, '</cols>');
+            fwrite($worksheetFilePointer, '</cols>'.PHP_EOL);
+
+            fwrite($worksheetFilePointer, $afterContent);
+            unset($afterContent);
         }
 
         if ($sheet->getAutoFilter() !== null) {
-            fwrite($worksheetFilePointer, ' <autoFilter ref="' . $sheet->getAutoFilter() . '"><extLst /></autoFilter>');
+            fwrite($worksheetFilePointer, ' <autoFilter ref="' . $sheet->getAutoFilter() . '"><extLst /></autoFilter>'.PHP_EOL);
         }
         if (count($sheet->getMergeCells()) > 0) {
-            fwrite($worksheetFilePointer, '<mergeCells>');
+            fwrite($worksheetFilePointer, '<mergeCells>'.PHP_EOL);
             foreach ($sheet->getMergeCells() as $mergeCell) {
-                fwrite($worksheetFilePointer, ' <mergeCell ref="' . $mergeCell . '"/>');
+                fwrite($worksheetFilePointer, "\t".' <mergeCell ref="' . $mergeCell . '"/>'.PHP_EOL);
             }
-            fwrite($worksheetFilePointer, '</mergeCells>');
+            fwrite($worksheetFilePointer, '</mergeCells>'.PHP_EOL);
         }
         fwrite($worksheetFilePointer, '</worksheet>');
         fclose($worksheetFilePointer);
+
     }
 }
