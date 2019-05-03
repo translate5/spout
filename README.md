@@ -1,8 +1,5 @@
 # Spout
 
-[![Build Status](https://travis-ci.org/wilsonglasser/spout.svg?branch=master)](https://travis-ci.org/box/spout)
-
-
 ## This version
 
 This fork is a modified version of Spout v3.0, with the ability to add merge cells, comment, formula cells, column dimensions and auto filter for XLSX Writer.
