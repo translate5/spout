@@ -48,6 +48,7 @@ class StyleManager extends \WilsonGlasser\Spout\Writer\Common\Manager\Style\Styl
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
 EOD;
 
+        $content .= $this->getNumberFormatContent();
         $content .= $this->getFontsSectionContent();
         $content .= $this->getFillsSectionContent();
         $content .= $this->getBordersSectionContent();
@@ -84,11 +85,12 @@ EOD;
         $content = '<numFmts count="'.count($numberFormats).'">';
 
 
-        $id = 176;
+        $id = 164;
 
         foreach($numberFormats as $numberFormat) {
             $numberFormat->setId($id);
             $content .= '<numFmt numFmtId="'.$numberFormat->getId().'" formatCode="'.$numberFormat->getFormatCode().'" />';
+            $id++;
         }
 
         $content .= '</numFmts>';
@@ -242,7 +244,7 @@ EOD;
             $fillId = $this->getFillIdForStyleId($styleId);
             $borderId = $this->getBorderIdForStyleId($styleId);
 
-            $content .= '<xf numFmtId="'.($style->getNumberFormat() !== null ? $style->getNumberFormat()->getId() : '0' ).'" fontId="' . $styleId . '" fillId="' . $fillId . '" borderId="' . $borderId . '" xfId="0"';
+            $content .= '<xf '.($style->getNumberFormat() !== null ? 'numFmtId="'.$style->getNumberFormat()->getId() .'" applyNumberFormat="1"': 'numFmtId="0"' ).' fontId="' . $styleId . '" fillId="' . $fillId . '" borderId="' . $borderId . '" xfId="0"';
 
             if ($style->shouldApplyFont()) {
                 $content .= ' applyFont="1"';

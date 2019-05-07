@@ -289,13 +289,13 @@ EOD;
             $value = $cell[1];
         }
 
-        if ($type === Cell::TYPE_STRING) {
+        if ($type === Cell::TYPE_STRING && !is_numeric($value)) {
             $cellXML .= $this->getCellXMLFragmentForNonEmptyString($this->setColumnMaxCharacters($columnIndex, $value));
         } elseif ($type === Cell::TYPE_FORMULA) {
             $cellXML .= '><f>' . $value[1]. '</f><v>' . $this->setColumnMaxCharacters($columnIndex, $value[0]) . '</v></c>';
         } elseif ($type === Cell::TYPE_BOOLEAN) {
             $cellXML .= ' t="b"><v>' . $this->setColumnMaxCharacters($columnIndex, (int)($value)) . '</v></c>';
-        } elseif ($type === Cell::TYPE_NUMERIC) {
+        } elseif ($type === Cell::TYPE_NUMERIC || ($type == Cell::TYPE_STRING && is_numeric($value))) {
             $cellXML .= '><v>' . $this->setColumnMaxCharacters($columnIndex, $value) . '</v></c>';
         } elseif ($type === Cell::TYPE_EMPTY) {
             if ($this->styleManager->shouldApplyStyleOnEmptyCell($styleId)) {
@@ -308,6 +308,7 @@ EOD;
         } else {
             throw new InvalidArgumentException('Trying to add a value with an unsupported type: ' . gettype($value));
         }
+
 
         return $cellXML.PHP_EOL;
     }

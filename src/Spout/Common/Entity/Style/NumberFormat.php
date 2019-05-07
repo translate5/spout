@@ -13,7 +13,7 @@ class NumberFormat
 
     function __construct($formatCode='')
     {
-        $this->formatCode = $formatCode;
+        $this->setFormatCode($formatCode);
     }
 
     public function getId()

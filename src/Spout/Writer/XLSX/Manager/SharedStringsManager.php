@@ -33,6 +33,9 @@ EOD;
     /** @var Escaper\XLSX Strings escaper */
     protected $stringsEscaper;
 
+
+    protected $strings = [];
+
     /**
      * @param string $xlFolder Path to the "xl" folder
      * @param Escaper\XLSX $stringsEscaper Strings escaper
@@ -73,11 +76,19 @@ EOD;
      */
     public function writeString($string)
     {
-        fwrite($this->sharedStringsFilePointer, '<si><t xml:space="preserve">' . $this->stringsEscaper->escape($string) . '</t></si>');
-        $this->numSharedStrings++;
+        $escaped = $this->stringsEscaper->escape($string);
 
-        // Shared string ID is zero-based
-        return ($this->numSharedStrings - 1);
+        if (isset($this->strings[$escaped])) {
+            return $this->strings[$escaped];
+        } else {
+
+            fwrite($this->sharedStringsFilePointer, '<si><t>' . $escaped. '</t></si>');
+            $this->strings[$escaped] = $this->numSharedStrings;
+            $this->numSharedStrings++;
+
+            // Shared string ID is zero-based
+            return ($this->numSharedStrings - 1);
+        }
     }
 
     /**
