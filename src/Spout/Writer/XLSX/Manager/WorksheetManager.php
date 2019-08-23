@@ -10,6 +10,7 @@ use WilsonGlasser\Spout\Common\Exception\IOException;
 use WilsonGlasser\Spout\Common\Helper\Escaper\XLSX as XLSXEscaper;
 use WilsonGlasser\Spout\Common\Helper\StringHelper;
 use WilsonGlasser\Spout\Common\Manager\OptionsManagerInterface;
+use WilsonGlasser\Spout\Reader\XLSX\Helper\DateFormatHelper;
 use WilsonGlasser\Spout\Writer\Common\Creator\InternalEntityFactory;
 use WilsonGlasser\Spout\Writer\Common\Entity\Options;
 use WilsonGlasser\Spout\Writer\Common\Entity\Worksheet;
@@ -296,7 +297,9 @@ EOD;
         } elseif ($type === Cell::TYPE_BOOLEAN) {
             $cellXML .= ' t="b"><v>' . $this->setColumnMaxCharacters($columnIndex, (int)($value)) . '</v></c>';
         } elseif ($type === Cell::TYPE_NUMERIC || ($type == Cell::TYPE_STRING && is_numeric($value))) {
-            $cellXML .= '><v>' . $this->setColumnMaxCharacters($columnIndex, $value) . '</v></c>';
+            $cellXML .= ' t="n"><v>' . $this->setColumnMaxCharacters($columnIndex, $value) . '</v></c>';
+        } elseif ($type === Cell::TYPE_DATE) {
+            $cellXML .= ' t="n"><v>' . $this->setColumnMaxCharacters($columnIndex, DateFormatHelper::toExcelDateFormat($value)) . '</v></c>';
         } elseif ($type === Cell::TYPE_EMPTY) {
             if ($this->styleManager->shouldApplyStyleOnEmptyCell($styleId)) {
                 $cellXML .= '/>';
