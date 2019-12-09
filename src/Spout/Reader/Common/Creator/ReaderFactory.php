@@ -65,7 +65,7 @@ class ReaderFactory
      * @throws \WilsonGlasser\Spout\Common\Exception\UnsupportedTypeException
      * @return ReaderInterface
      */
-    public static function createFromFile(string $path)
+    public static function createFromFile($path)
     {
         if (!\is_file($path)) {
             throw new IOException(
@@ -75,7 +75,7 @@ class ReaderFactory
 
         $ext = \pathinfo($path, PATHINFO_EXTENSION);
         $ext = \strtolower($ext);
-        $readerType = self::$extensionReaderMap[$ext] ?? null;
+        $readerType = self::$extensionReaderMap[$ext] ? self::$extensionReaderMap[$ext] : null;
         if ($readerType === null) {
             throw new UnsupportedTypeException(
                 sprintf('No readers supporting the file extension "%s".', $ext)
