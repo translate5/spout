@@ -273,7 +273,7 @@ EOD;
             if (count($alignment)) {
                 $content .= ' applyAlignment="1"><alignment ';
                 foreach($alignment as $k => $v) {
-                    $content .= $k.'="'.$v.'" ';
+                    $content .= $k.'="'.$v.'"';
                 }
                 $content .= '/></xf>';
             } else {

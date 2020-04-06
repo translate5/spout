@@ -30,7 +30,7 @@ class ReaderEntityFactory
      * @throws \WilsonGlasser\Spout\Common\Exception\UnsupportedTypeException
      * @return ReaderInterface
      */
-    public static function createReaderFromFile($path)
+    public static function createReaderFromFile(string $path)
     {
         return (new ReaderFactory())->createFromFile($path);
     }

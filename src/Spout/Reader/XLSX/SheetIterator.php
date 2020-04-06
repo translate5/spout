@@ -16,7 +16,7 @@ class SheetIterator implements IteratorInterface
     protected $sheets;
 
     /** @var int The index of the sheet being read (zero-based) */
-    protected $currentSheetIndex = 0;
+    protected $currentSheetIndex;
 
     /**
      * @param SheetManager $sheetManager Manages sheets

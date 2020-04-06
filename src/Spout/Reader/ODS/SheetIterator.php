@@ -47,7 +47,7 @@ class SheetIterator implements IteratorInterface
     protected $hasFoundSheet;
 
     /** @var int The index of the sheet being read (zero-based) */
-    protected $currentSheetIndex = 0;
+    protected $currentSheetIndex;
 
     /** @var string The name of the sheet that was defined as active */
     protected $activeSheetName;
