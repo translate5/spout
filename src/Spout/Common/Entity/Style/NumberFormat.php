@@ -31,7 +31,7 @@ class NumberFormat
     }
 
     public function setFormatCode($formatCode) {
-        $this->formatCode = htmlentities($formatCode);
+        $this->formatCode = str_replace('"',"&quot;",$formatCode);
         return $this;
     }
 }

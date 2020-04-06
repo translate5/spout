@@ -2,6 +2,10 @@
 
 namespace WilsonGlasser\Spout\Reader\XLSX\Helper;
 
+use DateInterval;
+use DateTime;
+use PHPExcel_Shared_TimeZone;
+
 /**
  * Class DateFormatHelper
  * This class provides helper functions to format Excel dates
@@ -22,34 +26,87 @@ class DateFormatHelper
         self::KEY_GENERAL => [
             // Time
             'am/pm' => 'A',  // Uppercase Ante meridiem and Post meridiem
-            ':mm'   => ':i', // Minutes with leading zeros - if preceded by a ":" (otherwise month)
-            'mm:'   => 'i:', // Minutes with leading zeros - if followed by a ":" (otherwise month)
-            'ss'    => 's',  // Seconds, with leading zeros
-            '.s'    => '',   // Ignore (fractional seconds format does not exist in PHP)
+            ':mm' => ':i', // Minutes with leading zeros - if preceded by a ":" (otherwise month)
+            'mm:' => 'i:', // Minutes with leading zeros - if followed by a ":" (otherwise month)
+            'ss' => 's',  // Seconds, with leading zeros
+            '.s' => '',   // Ignore (fractional seconds format does not exist in PHP)
 
             // Date
-            'e'     => 'Y',  // Full numeric representation of a year, 4 digits
-            'yyyy'  => 'Y',  // Full numeric representation of a year, 4 digits
-            'yy'    => 'y',  // Two digit representation of a year
+            'e' => 'Y',  // Full numeric representation of a year, 4 digits
+            'yyyy' => 'Y',  // Full numeric representation of a year, 4 digits
+            'yy' => 'y',  // Two digit representation of a year
             'mmmmm' => 'M',  // Short textual representation of a month, three letters ("mmmmm" should only contain the 1st letter...)
-            'mmmm'  => 'F',  // Full textual representation of a month
-            'mmm'   => 'M',  // Short textual representation of a month, three letters
-            'mm'    => 'm',  // Numeric representation of a month, with leading zeros
-            'm'     => 'n',  // Numeric representation of a month, without leading zeros
-            'dddd'  => 'l',  // Full textual representation of the day of the week
-            'ddd'   => 'D',  // Textual representation of a day, three letters
-            'dd'    => 'd',  // Day of the month, 2 digits with leading zeros
-            'd'     => 'j',  // Day of the month without leading zeros
+            'mmmm' => 'F',  // Full textual representation of a month
+            'mmm' => 'M',  // Short textual representation of a month, three letters
+            'mm' => 'm',  // Numeric representation of a month, with leading zeros
+            'm' => 'n',  // Numeric representation of a month, without leading zeros
+            'dddd' => 'l',  // Full textual representation of the day of the week
+            'ddd' => 'D',  // Textual representation of a day, three letters
+            'dd' => 'd',  // Day of the month, 2 digits with leading zeros
+            'd' => 'j',  // Day of the month without leading zeros
         ],
         self::KEY_HOUR_12 => [
-            'hh'    => 'h',  // 12-hour format of an hour without leading zeros
-            'h'     => 'g',  // 12-hour format of an hour without leading zeros
+            'hh' => 'h',  // 12-hour format of an hour without leading zeros
+            'h' => 'g',  // 12-hour format of an hour without leading zeros
         ],
         self::KEY_HOUR_24 => [
-            'hh'    => 'H',  // 24-hour hours with leading zero
-            'h'     => 'G',  // 24-hour format of an hour without leading zeros
+            'hh' => 'H',  // 24-hour hours with leading zero
+            'h' => 'G',  // 24-hour format of an hour without leading zeros
         ],
     ];
+
+    /**
+     * FormattedPHPToExcel
+     *
+     * @param integer $year
+     * @param integer $month
+     * @param integer $day
+     * @param integer $hours
+     * @param integer $minutes
+     * @param integer $seconds
+     * @return   integer    Excel date/time value
+     */
+    public static function FormattedPHPToExcel($year, $month, $day, $hours = 0, $minutes = 0, $seconds = 0)
+    {
+        // TODO fix old dates
+
+        $utc = new \DateTimeZone('UTC');
+        $dt = new \DateTime($year.'-'.$month.'-'.$day.'T'.str_pad($hours,2, '0', STR_PAD_LEFT).':'.str_pad($minutes,2, '0', STR_PAD_LEFT).':'.str_pad($seconds,2, '0', STR_PAD_LEFT), $utc);
+
+        return ($dt->getTimestamp()/86400)+25569;
+
+
+    }
+
+
+    /**
+     *    Convert a date from PHP to Excel
+     *
+     * @param mixed $dateValue PHP serialized date/time or date object
+     * @return    mixed        Excel date/time value
+     *                            or boolean FALSE on failure
+     */
+    public static function toExcelDateFormat($dateValue = 0)
+    {
+        $saveTimeZone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
+
+        $normalizedDate = '';
+        if ((is_object($dateValue)) && ($dateValue instanceof DateTime)) {
+            $normalizedDate = $dateValue->format('Y-m-d-H-i-s');
+        } elseif (is_numeric($dateValue)) {
+            $normalizedDate = date('Y-m-d-H-i-s', $dateValue);
+        } elseif (is_string($dateValue)) {
+            $normalizedDate = $dateValue;
+        }
+        $t = explode('-', $normalizedDate);
+
+        if (count($t) < 3) {
+            throw new \Exception('Invalid date format');
+        }
+
+        return self::FormattedPHPToExcel($t[0], $t[1], $t[2], isset($t[3]) ? $t[3] : 0, isset($t[4]) ? $t[4] : 0, isset($t[5]) ? $t[5] : 0);
+    }
 
     /**
      * Converts the given Excel date format to a format understandable by the PHP date function.
