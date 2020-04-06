@@ -37,7 +37,12 @@ class WorksheetManager implements WorksheetManagerInterface
 
     const SHEET_XML_FILE_HEADER = <<<'EOD'
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+<worksheet xml:space="preserve" xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+           xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+           xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"
+           xmlns:x14="http://schemas.microsoft.com/office/spreadsheetml/2009/9/main"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="x14ac"
+           xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac">
 EOD;
 
     /** @var bool Whether inline or shared strings should be used */
@@ -426,6 +431,11 @@ EOD;
             }
             fwrite($worksheetFilePointer, '</mergeCells>'.PHP_EOL);
         }
+
+        if (count($worksheet->getExternalSheet()->getComments())) {
+            fwrite($worksheetFilePointer, '<legacyDrawing r:id="rId_comments_vml'.$worksheet->getId().'"/>');
+        }
+
         fwrite($worksheetFilePointer, '</worksheet>');
         fclose($worksheetFilePointer);
 

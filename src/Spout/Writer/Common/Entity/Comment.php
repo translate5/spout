@@ -10,6 +10,8 @@ use WilsonGlasser\Spout\Common\Entity\Style\Style;
 class Comment
 {
 
+    const DEFAULT_BACKGROUND_COLOR = '#FFFFE1';
+    
     /**
      * The comment cell
      * @var string
@@ -38,6 +40,41 @@ class Comment
      * @var Style
      */
     protected $style;
+
+    /**
+     * Comment width (CSS style, i.e. XXpx or YYpt).
+     *
+     * @var string
+     */
+    private $width = '96pt';
+
+    /**
+     * Left margin (CSS style, i.e. XXpx or YYpt).
+     *
+     * @var string
+     */
+    private $marginLeft = '59.25pt';
+
+    /**
+     * Top margin (CSS style, i.e. XXpx or YYpt).
+     *
+     * @var string
+     */
+    private $marginTop = '1.5pt';
+
+    /**
+     * Visible.
+     *
+     * @var bool
+     */
+    private $visible = false;
+
+    /**
+     * Comment height (CSS style, i.e. XXpx or YYpt).
+     *
+     * @var string
+     */
+    private $height = '55.5pt';
 
     /**
      * @param $value mixed
@@ -126,5 +163,135 @@ class Comment
     public function getStyle()
     {
         return $this->style;
+    }
+
+    /**
+     * @param $visible
+     */
+    public function setVisible($visible) {
+        $this->visible = $visible;
+    }
+
+    /**
+     * Get hash code.
+     *
+     * @return string Hash code
+     */
+    public function getHashCode()
+    {
+        return md5(
+            $this->author .
+            $this->text .
+            $this->width .
+            $this->height .
+            $this->marginLeft .
+            $this->marginTop .
+            ($this->visible ? 1 : 0) .
+            $this->alignment .
+            __CLASS__
+        );
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function getVisible() {
+        return $this->visible;
+    }
+    /**
+     * Get comment width (CSS style, i.e. XXpx or YYpt).
+     *
+     * @return string
+     */
+    public function getWidth()
+    {
+        return $this->width;
+    }
+
+    /**
+     * Set comment width (CSS style, i.e. XXpx or YYpt).
+     *
+     * @param string $width
+     *
+     * @return $this
+     */
+    public function setWidth($width)
+    {
+        $this->width = $width;
+
+        return $this;
+    }
+
+    /**
+     * Get comment height (CSS style, i.e. XXpx or YYpt).
+     *
+     * @return string
+     */
+    public function getHeight()
+    {
+        return $this->height;
+    }
+
+    /**
+     * Set comment height (CSS style, i.e. XXpx or YYpt).
+     *
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function setHeight($value)
+    {
+        $this->height = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get left margin (CSS style, i.e. XXpx or YYpt).
+     *
+     * @return string
+     */
+    public function getMarginLeft()
+    {
+        return $this->marginLeft;
+    }
+
+    /**
+     * Set left margin (CSS style, i.e. XXpx or YYpt).
+     *
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function setMarginLeft($value)
+    {
+        $this->marginLeft = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get top margin (CSS style, i.e. XXpx or YYpt).
+     *
+     * @return string
+     */
+    public function getMarginTop()
+    {
+        return $this->marginTop;
+    }
+
+    /**
+     * Set top margin (CSS style, i.e. XXpx or YYpt).
+     *
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function setMarginTop($value)
+    {
+        $this->marginTop = $value;
+
+        return $this;
     }
 }

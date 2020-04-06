@@ -145,4 +145,38 @@ class CellHelper
 
         return $colWidth;
     }
+
+    /**
+     * Checks if a coordinate represents a range of cells.
+     *
+     * @param string $coord eg: 'A1' or 'A1:A2' or 'A1:A2,C1:C2'
+     *
+     * @return bool Whether the coordinate represents a range of cells
+     */
+    public static function coordinateIsRange($coord)
+    {
+        return (strpos($coord, ':') !== false) || (strpos($coord, ',') !== false);
+    }
+    
+    /**
+     * Coordinate from string.
+     *
+     * @param string $pCoordinateString eg: 'A1'
+     *
+     * @throws Exception
+     *
+     * @return string[] Array containing column and row (indexes 0 and 1)
+     */
+    public static function coordinateFromString($pCoordinateString)
+    {
+        if (preg_match('/^([$]?[A-Z]{1,3})([$]?\\d{1,7})$/', $pCoordinateString, $matches)) {
+            return [$matches[1], $matches[2]];
+        } elseif (self::coordinateIsRange($pCoordinateString)) {
+            throw new \Exception('Cell coordinate string can not be a range of cells');
+        } elseif ($pCoordinateString == '') {
+            throw new \Exception('Cell coordinate can not be zero-length string');
+        }
+
+        throw new \Exception('Invalid cell coordinate ' . $pCoordinateString);
+    }
 }
