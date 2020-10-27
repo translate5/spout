@@ -201,6 +201,19 @@ class StyleBuilder
         return $this;
     }
 
+    /**
+     * Set row height
+     *
+     * @param float $height
+     * @return $this
+     */
+    public function setRowHeight($height)
+    {
+        $this->style->setHeight($height);
+
+        return $this;
+    }
+
 
     /**
      * Returns the configured style. The style is cached and can be reused.

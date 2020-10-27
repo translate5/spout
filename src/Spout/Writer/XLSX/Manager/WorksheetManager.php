@@ -182,7 +182,13 @@ EOD;
         }
         $rowIndex = $worksheet->getLastWrittenRowIndex() + 1;
 
-        $rowXML = '<row r="' . $rowIndex . '" spans="1:' . $numCells . '">'.PHP_EOL;
+        $rowXML = '<row r="' . $rowIndex . '" spans="1:' . $numCells . '" ';
+
+        if (!empty($rowStyle->getHeight())) {
+            $rowXML .= ' ht="'.$rowStyle->getHeight() .'" customHeight="1" ';
+        }
+
+        $rowXML .= '  >'.PHP_EOL;
 
         foreach ($cells as $cell) {
             $rowXML .= "\t".$this->applyStyleAndGetCellXML($cell, $rowStyle, $rowIndex, $cellIndex);

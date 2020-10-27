@@ -86,6 +86,9 @@ class Style
     /** @var bool */
     private $hasSetBackgroundColor = false;
 
+    /** @var float */
+    private $height;
+
     /** @var NumberFormat */
     private $numberFormat;
 
@@ -96,6 +99,27 @@ class Style
             self::$instance = new Style();
         }
         return self::$instance;
+    }
+
+    /**
+     * Get row height
+     * @return float|null
+     */
+    public function getHeight()
+    {
+        return $this->height;
+    }
+
+    /**
+     * Set row height
+     * @param float $height
+     * @return Style
+     */
+    public function setHeight($height)
+    {
+        $this->height = $height;
+
+        return $this;
     }
 
     /**

@@ -54,7 +54,7 @@ class ColumnDimension
     private $autoSize = false;
 
     /**
-     * Create a new PHPExcel_Worksheet_ColumnDimension
+     * Create a new ColumnDimension
      *
      * @param string|int $pIndex Character column index
      * @param float $width Column width

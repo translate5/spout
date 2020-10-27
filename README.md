@@ -14,7 +14,74 @@ Join the community and come discuss about Spout: [![Gitter](https://badges.gitte
 
 ## Documentation
 
-Sorry but I won't create a documentation for the new methods at the moment.
+Sorry but I can't create a documentation for the new methods at the moment.
+
+I will just list the small examples:
+
+* Merge cells *
+`$worksheet = $writer->getCurrentSheet();
+$worksheet->mergeCells('A1:B1');`
+
+* Row Height *
+`$rowStyle = (new StyleBuilder())
+    ->setFontSize(10)
+    ->setFontName('Arial')
+    ->setRowHeight(50)
+    ->build();
+
+$writer->addRow(new Row([new Cell('Hello')], $rowStyle));`
+
+* Column Dimension (Width) *
+`$worksheet = $writer->getCurrentSheet();
+// specific size
+$worksheet->addColumnDimension(new ColumnDimension(CellHelper::getCellIndexFromColumnIndex($Column), 50));
+// auto size
+$worksheet->addColumnDimension(new ColumnDimension(
+                'A',
+                -1,
+                true
+            ));`
+
+* Auto Filter *
+Enable excel auto filters
+`$worksheet = $writer->getCurrentSheet();
+$worksheet->setAutoFilter('A1:Z1');`
+
+* Formula value *
+Added support to show a calculated value for a formula (Will not calculate, you need to pass the correct value)
+`
+$Cell = new Cell('=A1', null);
+$Cell->setCalculatedValue('100.00');
+`
+
+* Number Format *
+`$originalValue = 100.0;
+$value = 'R$'.number_format($originalValue, 2,',','.');
+$style = (new StyleBuilder())
+        ->setFontSize(10)
+        ->setFontName('Arial')
+        ->setNumberFormat(new NumberFormat('0 - "' . $value . '"'))
+        ->build();
+$Cell = new Cell($value, $style);
+// date
+$styleMonthYear =  (new StyleBuilder())
+    ->setFontSize(10)
+    ->setFontName('Arial')
+    ->setNumberFormat(new NumberFormat('MM/YYYY'))
+    ->build();`
+
+* Comments *
+`$worksheet = $writer->getCurrentSheet();
+$worksheet->addComment(new Comment('A1', 'My comment', 'Comment user, null for nothing'));`
+
+* Column Index from Cell Index *
+Returns the column index (base 10) associated to the base 26 cell index.
+Excel uses A to Z letters for column indexing, where A is the 1st column,
+Z is the 26th and AA is the 27th.
+The mapping is zero based, so that 0 maps to A, B maps to 1, Z to 25 and AA to 26.
+`CellHelper::getColumnToIndexFromCellIndex('A1')`
+
+
 
 Spout Full documentation can be found at [http://opensource.box.com/spout/](http://opensource.box.com/spout/).
 
