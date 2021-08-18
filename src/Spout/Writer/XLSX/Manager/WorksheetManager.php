@@ -301,13 +301,13 @@ EOD;
             $value = $cell[1];
         }
 
-        if ($type === Cell::TYPE_STRING && !is_numeric($value)) {
+        if ($type === Cell::TYPE_STRING && preg_match('/[^-.0-9]/', $value)) {
             $cellXML .= $this->getCellXMLFragmentForNonEmptyString($this->setColumnMaxCharacters($columnIndex, $value));
         } elseif ($type === Cell::TYPE_FORMULA) {
             $cellXML .= '><f>' . $value[1]. '</f><v>' . $this->setColumnMaxCharacters($columnIndex, $value[0]) . '</v></c>';
         } elseif ($type === Cell::TYPE_BOOLEAN) {
             $cellXML .= ' t="b"><v>' . $this->setColumnMaxCharacters($columnIndex, (int)($value)) . '</v></c>';
-        } elseif ($type === Cell::TYPE_NUMERIC || ($type == Cell::TYPE_STRING && is_numeric($value))) {
+        } elseif ($type === Cell::TYPE_NUMERIC || ($type == Cell::TYPE_STRING && !preg_match('/[^-.0-9]/', $value) && is_numeric($value))) {
             $cellXML .= ' t="n"><v>' . $this->setColumnMaxCharacters($columnIndex, $value) . '</v></c>';
         } elseif ($type === Cell::TYPE_DATE) {
             $cellXML .= ' t="n"><v>' . $this->setColumnMaxCharacters($columnIndex, DateFormatHelper::toExcelDateFormat($value)) . '</v></c>';
