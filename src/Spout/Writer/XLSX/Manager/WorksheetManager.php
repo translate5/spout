@@ -311,7 +311,7 @@ EOD;
             $cellXML .= ' t="n"><v>' . $this->setColumnMaxCharacters($columnIndex, $value) . '</v></c>';
         } elseif ($type === Cell::TYPE_DATE) {
             $cellXML .= ' t="n"><v>' . $this->setColumnMaxCharacters($columnIndex, DateFormatHelper::toExcelDateFormat($value)) . '</v></c>';
-        } elseif ($type === Cell::TYPE_EMPTY) {
+        } elseif ($type === Cell::TYPE_EMPTY || empty($value) ) {
             if ($this->styleManager->shouldApplyStyleOnEmptyCell($styleId)) {
                 $cellXML .= '/>';
             } else {
