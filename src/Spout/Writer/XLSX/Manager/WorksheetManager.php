@@ -319,6 +319,8 @@ EOD;
                 // NOTE: not appending to $cellXML is the right behavior!!
                 $cellXML = '';
             }
+        } else if ($type === Cell::TYPE_STRING && !preg_match('/[^-.0-9]/', $value)) {
+            $cellXML .= $this->getCellXMLFragmentForNonEmptyString($this->setColumnMaxCharacters($columnIndex, $value));
         } else {
             throw new InvalidArgumentException('Trying to add a value with an unsupported type: ' . gettype($value));
         }
