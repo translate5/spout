@@ -92,6 +92,12 @@ class Style
     /** @var NumberFormat */
     private $numberFormat;
 
+    /** @var string Format */
+    private $format;
+
+    /** @var bool */
+    private $hasSetFormat = false;
+
     private static $instance;
 
     public static function defaultStyle() {
@@ -492,6 +498,60 @@ class Style
         return $this->hasSetBackgroundColor;
     }
 
+    /**
+     * Sets format
+     * @param string $format
+     * @return Style
+     */
+    public function setFormat($format)
+    {
+        $this->hasSetFormat = true;
+        $this->format = $format;
+        $this->isEmpty = false;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormat()
+    {
+        return $this->format;
+    }
+
+    /**
+     * @return bool Whether format should be applied
+     */
+    public function shouldApplyFormat()
+    {
+        return $this->hasSetFormat;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRegistered() : bool
+    {
+        return $this->isRegistered;
+    }
+
+    public function markAsRegistered(?int $id) : void
+    {
+        $this->setId($id);
+        $this->isRegistered = true;
+    }
+
+    public function unmarkAsRegistered() : void
+    {
+        $this->setId(0);
+        $this->isRegistered = false;
+    }
+
+    public function isEmpty() : bool
+    {
+        return $this->isEmpty;
+    }
 
     /**
      * @return NumberFormat
