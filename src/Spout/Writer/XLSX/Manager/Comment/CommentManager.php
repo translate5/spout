@@ -101,9 +101,9 @@ EOD;
             $authorId = array_search($comment->getAuthor(), $this->tmpAuthors);
             $comment->setAuthorId($authorId);
 
-            $content .= '<comment ref="' . $comment->getCell() . '"' . ($comment->getAuthorId() !== null ? ' authorId="' . $comment->getAuthorId() . '"' : '') . '>';
-
             if (!empty($comment->getText()) && $comment->getText() !== null) {
+                $content .= '<comment ref="' . $comment->getCell() . '"' . ($comment->getAuthorId() !== null ? ' authorId="' . $comment->getAuthorId() . '"' : '') . '>';
+
 
                 // apply styles!
                 $fontSize = $comment->getStyle()->getFontSize() > 0 ? $comment->getStyle()->getFontSize() : Style::DEFAULT_FONT_SIZE;
@@ -119,9 +119,10 @@ EOD;
                 $content .= '<rPr><sz val="' . $fontSize . '"/><rFont val="' . $fontFamily . '"/><charset val="0"/></rPr>';
 
                 $content .= '<t xml:space="preserve">' . $this->stringsEscaper->escape($comment->getText()) . '</t></r></text>';
-            }
+            
 
-            $content .= '</comment>' . PHP_EOL;
+                $content .= '</comment>' . PHP_EOL;
+            }
         }
 
         $content .= '</commentList>';
