@@ -79,6 +79,7 @@ EOD;
             }
         }
         $tags = [];
+        $minNumFmtId = 163;
         $registeredFormats = $this->styleRegistry->getRegisteredFormats();
         foreach ($registeredFormats as $styleId) {
             $numFmtId = $this->styleRegistry->getFormatIdForStyleId($styleId);
@@ -91,6 +92,8 @@ EOD;
             /** @var Style $style */
             $style = $this->styleRegistry->getStyleFromStyleId($styleId);
             $format = $style->getFormat();
+            if ($numFmtId > $minNumFmtId)
+                $minNumFmtId = $numFmtId;
             $tags[] = '<numFmt numFmtId="' . $numFmtId . '" formatCode="' . $format . '"/>';
         }
 
@@ -100,7 +103,7 @@ EOD;
         $content = '<numFmts count="'.(count($numberFormats) + count($tags)).'">';
 
 
-        $id = 164;
+        $id = ++$minNumFmtId;
 
         foreach($numberFormats as $numberFormat) {
             $numberFormat->setId($id);
