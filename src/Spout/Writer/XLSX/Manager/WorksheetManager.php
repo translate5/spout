@@ -301,6 +301,9 @@ EOD;
             $value = $cell[1];
         }
 
+        if ($value === null)
+            $value = '';
+
         if ($type === Cell::TYPE_STRING && preg_match('/[^-.0-9]/', $value)) {
             $cellXML .= $this->getCellXMLFragmentForNonEmptyString($this->setColumnMaxCharacters($columnIndex, $value));
         } elseif ($type === Cell::TYPE_FORMULA) {
