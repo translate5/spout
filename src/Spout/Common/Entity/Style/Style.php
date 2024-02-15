@@ -77,6 +77,9 @@ class Style
     /** @var Border */
     private $border;
 
+    /** @var $isEmpty */
+    public $isEmpty = false;
+
     /** @var bool Whether border properties should be applied */
     private $shouldApplyBorder = false;
 
