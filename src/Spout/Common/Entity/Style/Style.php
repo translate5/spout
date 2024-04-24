@@ -101,6 +101,8 @@ class Style
     /** @var bool */
     private $hasSetFormat = false;
 
+    public $isEmpty = false;
+
     private static $instance;
 
     public static function defaultStyle() {
