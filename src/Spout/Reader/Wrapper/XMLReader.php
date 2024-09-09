@@ -113,17 +113,17 @@ class XMLReader extends \XMLReader
 
     /**
      * Move cursor to next node skipping all subtrees
-     * @see \XMLReader::next
-     *
-     * @param string|null $localName The name of the next node to move to
-     * @throws \WilsonGlasser\Spout\Reader\Exception\XMLProcessingException If an error/warning occurred
-     * @return bool TRUE on success or FALSE on failure
+     * @link https://php.net/manual/en/xmlreader.next.php
+     * @param string $name [optional] <p>
+     * The name of the next node to move to.
+     * </p>
+     * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
      */
-    public function next(?string $localName = null)
-    {
+    public function next(#[LanguageLevelTypeAware(['8.0' => 'string|null'], default: '')] $name = null): bool
+        {
         $this->useXMLInternalErrors();
 
-        $wasNextSuccessful = parent::next($localName);
+        $wasNextSuccessful = parent::next($name);
 
         $this->resetXMLInternalErrorsSettingAndThrowIfXMLErrorOccured();
 
