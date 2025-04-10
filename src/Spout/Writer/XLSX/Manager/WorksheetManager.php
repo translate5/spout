@@ -189,9 +189,9 @@ EOD;
         }
 
         $rowXML .= '  >'.PHP_EOL;
-
+        $sheetIndex = $worksheet->getExternalSheet()->getIndex();
         foreach ($cells as $cell) {
-            $rowXML .= "\t".$this->applyStyleAndGetCellXML($cell, $rowStyle, $rowIndex, $cellIndex);
+            $rowXML .= "\t".$this->applyStyleAndGetCellXML($cell, $rowStyle, $rowIndex, $cellIndex, $sheetIndex);
             $cellIndex++;
         }
 
@@ -211,10 +211,11 @@ EOD;
      * @param Style $rowStyle
      * @param int $rowIndex
      * @param int $cellIndex
+     * @param int $sheetIndex
      * @return string
      * @throws InvalidArgumentException If the given value cannot be processed
      */
-    private function applyStyleAndGetCellXML($cell, Style $rowStyle, $rowIndex, $cellIndex)
+    private function applyStyleAndGetCellXML($cell, Style $rowStyle, $rowIndex, $cellIndex, int $sheetIndex = 0)
     {
         $isObject = $cell instanceof Cell;
         // Apply row and extra styles
@@ -234,7 +235,7 @@ EOD;
 
         $registeredStyle = $this->styleManager->registerStyle($newCellStyle);
 
-        return $this->getCellXML($rowIndex, $cellIndex, $cell, $registeredStyle->getId());
+        return $this->getCellXML($rowIndex, $cellIndex, $cell, $registeredStyle->getId(), $sheetIndex);
     }
 
     /**
@@ -250,9 +251,10 @@ EOD;
      * Increment max length for column
      * @param string $columnIndex
      * @param string $text
+     * @param int $sheetIndex
      * @return string
      */
-    protected function setColumnMaxCharacters($columnIndex, $text)
+    protected function setColumnMaxCharacters($columnIndex, $text, int $sheetIndex = 0)
     {
 
         if (strpos($text, "\n") !== false) {
@@ -266,10 +268,10 @@ EOD;
             $length = StringHelper::getStringLength($text);
         }
 
-        if (!isset($this->columnsMaxTextLength[$columnIndex]))
-            $this->columnsMaxTextLength[$columnIndex] = $length;
+        if (!isset($this->columnsMaxTextLength[$sheetIndex][$columnIndex]))
+            $this->columnsMaxTextLength[$sheetIndex][$columnIndex] = $length;
         else
-            $this->columnsMaxTextLength[$columnIndex] = max($this->columnsMaxTextLength[$columnIndex], $length);
+            $this->columnsMaxTextLength[$sheetIndex][$columnIndex] = max($this->columnsMaxTextLength[$sheetIndex][$columnIndex], $length);
         return $text;
     }
 
@@ -280,10 +282,11 @@ EOD;
      * @param int $cellNumber
      * @param Cell|array $cell
      * @param int $styleId
+     * @param int $sheetIndex
      * @return string
      * @throws InvalidArgumentException If the given value cannot be processed
      */
-    private function getCellXML($rowIndex, $cellNumber, $cell, $styleId)
+    private function getCellXML($rowIndex, $cellNumber, $cell, $styleId, int $sheetIndex = 0)
     {
         $columnIndex = CellHelper::getCellIndexFromColumnIndex($cellNumber);
         $cellXML = '<c r="' . $columnIndex . $rowIndex . '"';
@@ -305,15 +308,15 @@ EOD;
             $value = '';
 
         if ($type === Cell::TYPE_STRING && preg_match('/[^-.0-9]/', $value)) {
-            $cellXML .= $this->getCellXMLFragmentForNonEmptyString($this->setColumnMaxCharacters($columnIndex, $value));
+            $cellXML .= $this->getCellXMLFragmentForNonEmptyString($this->setColumnMaxCharacters($columnIndex, $value, $sheetIndex));
         } elseif ($type === Cell::TYPE_FORMULA) {
-            $cellXML .= '><f>' . $value[1]. '</f><v>' . $this->setColumnMaxCharacters($columnIndex, $value[0]) . '</v></c>';
+            $cellXML .= '><f>' . $value[1]. '</f><v>' . $this->setColumnMaxCharacters($columnIndex, $value[0], $sheetIndex) . '</v></c>';
         } elseif ($type === Cell::TYPE_BOOLEAN) {
-            $cellXML .= ' t="b"><v>' . $this->setColumnMaxCharacters($columnIndex, (int)($value)) . '</v></c>';
+            $cellXML .= ' t="b"><v>' . $this->setColumnMaxCharacters($columnIndex, (int)($value), $sheetIndex) . '</v></c>';
         } elseif ($type === Cell::TYPE_NUMERIC || ($type == Cell::TYPE_STRING && !preg_match('/[^-.0-9]/', $value) && is_numeric($value))) {
-            $cellXML .= ' t="n"><v>' . $this->setColumnMaxCharacters($columnIndex, $value) . '</v></c>';
+            $cellXML .= ' t="n"><v>' . $this->setColumnMaxCharacters($columnIndex, $value, $sheetIndex) . '</v></c>';
         } elseif ($type === Cell::TYPE_DATE) {
-            $cellXML .= ' t="n"><v>' . $this->setColumnMaxCharacters($columnIndex, DateFormatHelper::toExcelDateFormat($value)) . '</v></c>';
+            $cellXML .= ' t="n"><v>' . $this->setColumnMaxCharacters($columnIndex, DateFormatHelper::toExcelDateFormat($value), $sheetIndex) . '</v></c>';
         } elseif ($type === Cell::TYPE_EMPTY || empty($value) ) {
             if ($this->styleManager->shouldApplyStyleOnEmptyCell($styleId)) {
                 $cellXML .= '/>';
@@ -323,7 +326,7 @@ EOD;
                 $cellXML = '';
             }
         } else if ($type === Cell::TYPE_STRING && !preg_match('/[^-.0-9]/', $value)) {
-            $cellXML .= $this->getCellXMLFragmentForNonEmptyString($this->setColumnMaxCharacters($columnIndex, $value));
+            $cellXML .= $this->getCellXMLFragmentForNonEmptyString($this->setColumnMaxCharacters($columnIndex, $value, $sheetIndex));
         } else {
             throw new InvalidArgumentException('Trying to add a value with an unsupported type: ' . gettype($value));
         }
@@ -384,7 +387,7 @@ EOD;
              * Autosize columns
              */
 
-            $sheet->calculateColumnWidths($this->getColumnsMaxTextLength(), $defaultStyle);
+            $sheet->calculateColumnWidths($this->getColumnsMaxTextLength()[$sheet->getIndex()], $defaultStyle);
 
             foreach ($sheet->getColumnDimensions() as $columnDimension) {
                 $cellIndex = CellHelper::getColumnToIndexFromCellIndex($columnDimension->getColumnIndex()) + 1;
